@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { fetchAllCalendarFeeds } from '@/lib/feedFetcher';
 
-export const dynamic = 'force-dynamic'; // Allows dynamic query param processing while fetch() handles internal 15-min ISR caching
+export const dynamic = 'force-dynamic';
 
 export async function GET(request: Request) {
   try {
@@ -9,6 +9,7 @@ export async function GET(request: Request) {
     const startParam = searchParams.get('start');
     const endParam = searchParams.get('end');
     const orgId = searchParams.get('orgId') || undefined;
+    const forceRefresh = searchParams.get('refresh') === 'true' || searchParams.get('force') === 'true';
 
     let windowStart: Date | undefined;
     let windowEnd: Date | undefined;
@@ -31,14 +32,32 @@ export async function GET(request: Request) {
       windowStart,
       windowEnd,
       targetOrgId: orgId,
+      forceRefresh,
     });
 
+    // Compute deterministic ETag based on events count, sources count, and timestamp
+    const etagSource = `${data.events.length}-${data.sources.length}-${data.lastUpdated}`;
+    let etagHash = 0;
+    for (let i = 0; i < etagSource.length; i++) {
+      etagHash = (etagHash << 5) - etagHash + etagSource.charCodeAt(i);
+      etagHash |= 0;
+    }
+    const etag = `"${Math.abs(etagHash).toString(36)}-${data.events.length}"`;
+
+    // Handle client conditional request (304 Not Modified)
+    const clientIfNoneMatch = request.headers.get('if-none-match');
+    if (!forceRefresh && clientIfNoneMatch && clientIfNoneMatch === etag) {
+      return new NextResponse(null, { status: 304 });
+    }
+
     const responseHeaders: Record<string, string> = {
-      'Cache-Control': 'public, s-maxage=900, stale-while-revalidate=1800',
+      ETag: etag,
+      'Cache-Control': forceRefresh
+        ? 'no-store, no-cache, must-revalidate'
+        : 'public, s-maxage=900, stale-while-revalidate=1800',
     };
 
     if (data.warnings.length > 0) {
-      // Header sanitized to prevent illegal header characters
       responseHeaders['X-Calendar-Warnings'] = encodeURIComponent(
         data.warnings.join(' | ')
       );

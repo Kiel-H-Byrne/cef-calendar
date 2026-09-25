@@ -14,7 +14,7 @@ interface CalendarHubProps {
 
 export function CalendarHub({ initialData }: CalendarHubProps) {
   const [events, setEvents] = useState<UnifiedCalendarEvent[]>(initialData.events);
-  const [sources] = useState<OrgCalendarConfig[]>(initialData.sources);
+  const [sources, setSources] = useState<OrgCalendarConfig[]>(initialData.sources);
   const [warnings, setWarnings] = useState<string[]>(initialData.warnings);
   const [lastUpdated, setLastUpdated] = useState<string>(initialData.lastUpdated);
 
@@ -51,16 +51,40 @@ export function CalendarHub({ initialData }: CalendarHubProps) {
     setSelectedOrgIds(new Set());
   };
 
-  // Re-fetch calendar feeds from server
+  // Re-fetch calendar feeds from server with on-demand cache bypass and state reconciliation
   const handleRefresh = async () => {
     setIsLoading(true);
     try {
-      const res = await fetch('/api/events', { cache: 'no-store' });
+      // Bust any server ISR cache and fetch fresh external feeds
+      const res = await fetch('/api/events?refresh=true', { cache: 'no-store' });
       if (res.ok) {
         const data: EventsApiResponse = await res.json();
         setEvents(data.events);
         setWarnings(data.warnings);
         setLastUpdated(data.lastUpdated);
+
+        // Reconcile organizations dynamically
+        const newSources = data.sources || [];
+        setSources(newSources);
+
+        setSelectedOrgIds((prev) => {
+          const next = new Set<string>();
+          const validIds = new Set(newSources.map((s) => s.id));
+          // Preserve valid active selections
+          for (const id of prev) {
+            if (validIds.has(id)) next.add(id);
+          }
+          // Auto-select any newly added organizations
+          for (const s of newSources) {
+            if (!sources.some((existing) => existing.id === s.id)) {
+              next.add(s.id);
+            }
+          }
+          return next.size > 0 ? next : validIds;
+        });
+
+        // Trigger on-demand ISR revalidation in background
+        fetch('/api/revalidate', { method: 'POST' }).catch(() => {});
       }
     } catch (err) {
       console.error('Failed to refresh events:', err);

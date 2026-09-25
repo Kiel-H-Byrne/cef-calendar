@@ -1,4 +1,4 @@
-import { CALENDAR_SOURCES, OrgCalendarConfig, UnifiedCalendarEvent } from '@/config/calendars';
+import { getCalendarSources, OrgCalendarConfig, UnifiedCalendarEvent } from '@/config/calendars';
 import { MOCK_ICS_FEEDS } from '@/mock-data/mockFeeds';
 import { parseIcsContent, ParseCalendarOptions } from './calendarParser';
 
@@ -16,6 +16,10 @@ export interface AggregatedFeedsResult {
   lastUpdated: string;
 }
 
+export interface FetchFeedOptions extends ParseCalendarOptions {
+  forceRefresh?: boolean;
+}
+
 /**
  * Determines whether a given URL is a placeholder/template URL rather than a live configured URL
  */
@@ -25,17 +29,18 @@ export function isPlaceholderUrl(url: string): boolean {
   return (
     lower.includes('...') ||
     lower.includes('example.com') ||
-    lower.includes('reachcalendar.ics') && lower.includes('...') ||
+    (lower.includes('reachcalendar.ics') && lower.includes('...')) ||
     lower.trim() === ''
   );
 }
 
 /**
- * Fetches and parses a single calendar feed with Next.js ISR caching and resilient error handling
+ * Fetches and parses a single calendar feed with Next.js Cache Tagging and resilient error handling.
+ * Supports forceRefresh to bypass cache when links are hot-swapped or refreshed.
  */
 export async function fetchCalendarFeed(
   source: OrgCalendarConfig,
-  options?: ParseCalendarOptions
+  options?: FetchFeedOptions
 ): Promise<FeedFetchResult> {
   const warnings: string[] = [];
   let rawIcsText = '';
@@ -44,7 +49,7 @@ export async function fetchCalendarFeed(
   const url = source.icsUrl;
 
   if (isPlaceholderUrl(url)) {
-    // URL is a placeholder; use bundled mock feed
+    // URL is a placeholder; use bundled mock feed if available
     rawIcsText = MOCK_ICS_FEEDS[source.id] || '';
     isFallback = true;
     if (!rawIcsText) {
@@ -55,15 +60,25 @@ export async function fetchCalendarFeed(
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 8000); // 8-second network timeout
 
-      const response = await fetch(url, {
-        next: { revalidate: 900 }, // 15-minute ISR cache
+      // Next.js fetch configuration with tag-based revalidation & forceRefresh support
+      const fetchInit: RequestInit & { next?: { revalidate?: number | false; tags?: string[] } } = {
         signal: controller.signal,
         headers: {
           'User-Agent': 'Community-Calendar-Overlay-Hub/1.0 (+https://github.com)',
           Accept: 'text/calendar, text/plain, */*',
         },
-      });
+      };
 
+      if (options?.forceRefresh) {
+        fetchInit.cache = 'no-store';
+      } else {
+        fetchInit.next = {
+          revalidate: 900, // 15-minute ISR cache
+          tags: ['calendar-feeds', `calendar-feed-${source.id}`],
+        };
+      }
+
+      const response = await fetch(url, fetchInit);
       clearTimeout(timeoutId);
 
       if (!response.ok) {
@@ -76,7 +91,8 @@ export async function fetchCalendarFeed(
         throw new Error('Received payload is not a valid iCalendar feed');
       }
     } catch (err: any) {
-      const errorMsg = err?.name === 'AbortError' ? 'Request timed out after 8s' : err?.message || String(err);
+      const errorMsg =
+        err?.name === 'AbortError' ? 'Request timed out after 8s' : err?.message || String(err);
       warnings.push(`Failed to fetch ${source.name} feed from ${url}: ${errorMsg}`);
 
       // Graceful fallback to mock data if available
@@ -109,14 +125,16 @@ export async function fetchCalendarFeed(
 }
 
 /**
- * Fetches all configured calendar feeds concurrently, aggregating results and isolating failures
+ * Fetches all dynamically resolved calendar feeds concurrently.
+ * Reconciles sources dynamically and isolates individual feed failures.
  */
 export async function fetchAllCalendarFeeds(
-  options?: ParseCalendarOptions & { targetOrgId?: string }
+  options?: FetchFeedOptions & { targetOrgId?: string }
 ): Promise<AggregatedFeedsResult> {
+  const allSources = getCalendarSources();
   const sourcesToFetch = options?.targetOrgId
-    ? CALENDAR_SOURCES.filter((s) => s.id === options.targetOrgId)
-    : CALENDAR_SOURCES;
+    ? allSources.filter((s) => s.id === options.targetOrgId)
+    : allSources;
 
   // Execute all feed fetches concurrently using Promise.allSettled
   const results = await Promise.allSettled(
@@ -145,7 +163,7 @@ export async function fetchAllCalendarFeeds(
 
   return {
     events: aggregatedEvents,
-    sources: CALENDAR_SOURCES,
+    sources: allSources,
     warnings: aggregatedWarnings,
     lastUpdated: new Date().toISOString(),
   };

@@ -34,61 +34,41 @@ export function formatDateYMD(d: Date): string {
 }
 
 /**
- * Check whether an occurrence date is in the EXDATE list
+ * Pre-indexes EXDATE entries into a fast O(1) Set lookup
  */
-function isDateExcluded(
-  exdate: any,
-  dateYMD: string,
-  dateISO: string,
-  occDate: Date
-): boolean {
-  if (!exdate) return false;
+function buildExdateIndex(exdate: any): Set<string> {
+  const index = new Set<string>();
+  if (!exdate) return index;
 
-  // exdate can be a map { 'YYYY-MM-DD': Date } or an array or single Date
   if (typeof exdate === 'object') {
-    if (exdate[dateYMD] || exdate[dateISO]) return true;
-
-    // Check values if object keys are arbitrary
     for (const key of Object.keys(exdate)) {
+      index.add(key);
       const val = exdate[key];
       if (val instanceof Date) {
-        if (Math.abs(val.getTime() - occDate.getTime()) < 60000) return true;
-        if (formatDateYMD(val) === dateYMD) return true;
+        index.add(formatDateYMD(val));
+        index.add(val.toISOString());
       }
     }
   }
-  return false;
+  return index;
 }
 
 /**
- * Retrieve any override event from the recurrences map for a specific date
+ * Pre-indexes RECURRENCE-ID override entries into a fast O(1) Map lookup
  */
-function findRecurrenceOverride(
-  recurrences: any,
-  dateYMD: string,
-  dateISO: string,
-  occDate: Date
-): any | null {
-  if (!recurrences || typeof recurrences !== 'object') return null;
+function buildRecurrencesIndex(recurrences: any): Map<string, any> {
+  const index = new Map<string, any>();
+  if (!recurrences || typeof recurrences !== 'object') return index;
 
-  // Direct lookup
-  if (recurrences[dateYMD]) return recurrences[dateYMD];
-  if (recurrences[dateISO]) return recurrences[dateISO];
-
-  // Fuzzy match on timestamp
   for (const key of Object.keys(recurrences)) {
     const item = recurrences[key];
+    index.set(key, item);
     if (item && item.start instanceof Date) {
-      if (Math.abs(item.start.getTime() - occDate.getTime()) < 60000) {
-        return item;
-      }
-      if (formatDateYMD(item.start) === dateYMD) {
-        return item;
-      }
+      index.set(formatDateYMD(item.start), item);
+      index.set(item.start.toISOString(), item);
     }
   }
-
-  return null;
+  return index;
 }
 
 /**
@@ -106,7 +86,8 @@ export function unescapeIcsText(input: any): string {
 }
 
 /**
- * Parses raw iCalendar text into normalized UnifiedCalendarEvents
+ * Parses raw iCalendar text into normalized UnifiedCalendarEvents with O(1) recurrence lookups
+ * and organization-namespaced event IDs to prevent multi-tenant collisions.
  */
 export function parseIcsContent(
   icsData: string,
@@ -148,7 +129,9 @@ export function parseIcsContent(
     const description = unescapeIcsText(vEvent.description) || undefined;
     const location = unescapeIcsText(vEvent.location) || undefined;
 
-    const baseUid = vEvent.uid || `event-${Math.random().toString(36).substring(2, 9)}`;
+    // Clean UID and namespace with source.id to prevent cross-organization collisions
+    const rawUid = vEvent.uid || `event-${Math.random().toString(36).substring(2, 9)}`;
+    const baseUid = `${source.id}_${rawUid.replace(/[^a-zA-Z0-9_-]/g, '_')}`;
 
     // Handle recurring event
     if (vEvent.rrule) {
@@ -160,27 +143,25 @@ export function parseIcsContent(
             ? 24 * 60 * 60 * 1000
             : 60 * 60 * 1000;
 
+        // Pre-index exdate and recurrences for fast O(1) queries
+        const exdateIndex = buildExdateIndex(vEvent.exdate);
+        const recurrencesIndex = buildRecurrencesIndex(vEvent.recurrences);
         const handledOverrideKeys = new Set<string>();
 
-        // Generate occurrences within window
+        // Generate occurrences within bounded rolling window
         const occurrences = vEvent.rrule.between(windowStart, windowEnd, true);
 
         for (const occDate of occurrences) {
           const dateYMD = formatDateYMD(occDate);
           const dateISO = occDate.toISOString();
 
-          // Check if excluded
-          if (isDateExcluded(vEvent.exdate, dateYMD, dateISO, occDate)) {
+          // O(1) exclusion check
+          if (exdateIndex.has(dateYMD) || exdateIndex.has(dateISO)) {
             continue;
           }
 
-          // Check for recurrence override (modified instance)
-          const override = findRecurrenceOverride(
-            vEvent.recurrences,
-            dateYMD,
-            dateISO,
-            occDate
-          );
+          // O(1) recurrence override check
+          const override = recurrencesIndex.get(dateYMD) || recurrencesIndex.get(dateISO);
 
           if (override && override.type === 'VEVENT') {
             const overStart: Date =
@@ -264,7 +245,7 @@ export function parseIcsContent(
                     : new Date(recStart.getTime() + baseDurationMs);
 
                 const recAllDay =
-                  vRecItem.start?.dateOnly === true ||
+                  (recStart as any)?.dateOnly === true ||
                   vRecItem.datetype === 'date';
 
                 events.push({
