@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { revalidateTag, revalidatePath } from 'next/cache';
+import { revalidatePath, revalidateTag } from "next/cache";
+import { NextRequest, NextResponse } from "next/server";
 
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
 export async function POST(request: NextRequest) {
   return handleRevalidate(request);
@@ -14,20 +14,26 @@ export async function GET(request: NextRequest) {
 async function handleRevalidate(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
-    const tag = searchParams.get('tag') || 'calendar-feeds';
-    const secret = searchParams.get('secret');
+    const tag = searchParams.get("tag") || "calendar-feeds";
+    const secret = searchParams.get("secret");
 
     // If REVALIDATE_SECRET is set in environment, check it
-    if (process.env.REVALIDATE_SECRET && secret !== process.env.REVALIDATE_SECRET) {
-      return NextResponse.json({ message: 'Invalid revalidation secret' }, { status: 401 });
+    if (
+      process.env.REVALIDATE_SECRET &&
+      secret !== process.env.REVALIDATE_SECRET
+    ) {
+      return NextResponse.json(
+        { message: "Invalid revalidation secret" },
+        { status: 401 },
+      );
     }
 
     // Instantly invalidate the tagged fetch cache entries
-    revalidateTag(tag);
+    revalidateTag(tag, "max");
 
     // Invalidate the ISR pre-rendered home page
-    revalidatePath('/');
-    revalidatePath('/api/events');
+    revalidatePath("/");
+    revalidatePath("/api/events");
 
     return NextResponse.json({
       revalidated: true,
@@ -41,7 +47,7 @@ async function handleRevalidate(request: NextRequest) {
         revalidated: false,
         error: err?.message || String(err),
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
