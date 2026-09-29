@@ -7,6 +7,7 @@ import timeGridPlugin from '@fullcalendar/timegrid';
 import listPlugin from '@fullcalendar/list';
 import interactionPlugin from '@fullcalendar/interaction';
 import { UnifiedCalendarEvent, OrgCalendarConfig } from '@/config/calendars';
+import { EasternStarEmblem, MasonicEmblem } from './FraternalEmblems';
 
 interface CalendarViewProps {
   events: UnifiedCalendarEvent[];
@@ -88,7 +89,7 @@ export function CalendarView({
   };
 
   return (
-    <div className="w-full bg-white dark:bg-zinc-900 rounded-2xl shadow-sm border border-zinc-200 dark:border-zinc-800 p-3 sm:p-5 transition-colors overflow-hidden">
+    <div className="w-full bg-white dark:bg-[#0B2545] rounded-xl shadow-card border border-slate-200 dark:border-slate-800 border-t-4 border-t-[#003366] dark:border-t-[#D4AF37] p-3 sm:p-5 transition-all overflow-hidden">
       <FullCalendar
         ref={calendarRef}
         plugins={[dayGridPlugin, timeGridPlugin, listPlugin, interactionPlugin]}
@@ -102,7 +103,7 @@ export function CalendarView({
           today: 'Today',
           month: 'Month',
           week: 'Week',
-          list: 'List',
+          list: 'Schedule List',
         }}
         events={fullCalendarEvents}
         eventClick={handleEventClick}
@@ -130,22 +131,26 @@ export function CalendarView({
         }}
         eventContent={(arg) => {
           const raw = arg.event.extendedProps?.rawEvent as UnifiedCalendarEvent | undefined;
-          const bgColor = raw?.backgroundColor || arg.event.backgroundColor || '#3b82f6';
+          const bgColor = raw?.backgroundColor || arg.event.backgroundColor || '#003366';
           const txtColor = raw?.textColor || arg.event.textColor || '#ffffff';
-          const bdrColor = raw?.borderColor || arg.event.borderColor || bgColor;
+          const bdrColor = raw?.borderColor || arg.event.borderColor || '#D4AF37';
+          const isOes = raw?.orgId === 'org-delta';
 
           if (arg.view.type.startsWith('list')) {
             return (
-              <div className="flex items-center gap-2 py-0.5 overflow-hidden">
+              <div className="flex items-center gap-2.5 py-0.5 overflow-hidden">
                 <span
-                  className="w-2.5 h-2.5 rounded-full flex-shrink-0"
+                  className="w-3 h-3 rounded-full flex-shrink-0 border border-black/10"
                   style={{ backgroundColor: bgColor }}
                 />
-                <span className="font-medium text-zinc-900 dark:text-zinc-100 truncate">
+                {isOes && (
+                  <EasternStarEmblem className="w-3.5 h-3.5 flex-shrink-0" />
+                )}
+                <span className="font-semibold text-[#0B2545] dark:text-[#F8F9FA] truncate">
                   {arg.event.title}
                 </span>
                 {raw?.location && (
-                  <span className="text-xs text-zinc-500 dark:text-zinc-400 hidden sm:inline truncate">
+                  <span className="text-xs text-slate-500 dark:text-slate-400 hidden sm:inline truncate">
                     • {raw.location}
                   </span>
                 )}
@@ -155,13 +160,19 @@ export function CalendarView({
 
           return (
             <div
-              className="flex items-center gap-1.5 px-1.5 py-0.5 rounded text-xs font-medium w-full overflow-hidden cursor-pointer shadow-xs hover:brightness-110 transition-all border"
+              className="flex items-center gap-1.5 px-2 py-0.5 rounded-md text-xs font-semibold w-full overflow-hidden cursor-pointer shadow-xs hover:brightness-110 transition-all border"
               style={{
                 backgroundColor: bgColor,
                 color: txtColor,
                 borderColor: bdrColor,
               }}
+              title={`${arg.event.title} (${raw?.orgName || ''})`}
             >
+              {isOes ? (
+                <EasternStarEmblem className="w-3 h-3 flex-shrink-0" />
+              ) : (
+                <MasonicEmblem className="w-3 h-3 flex-shrink-0" color="#D4AF37" strokeWidth={3} />
+              )}
               {!arg.event.allDay && (
                 <span className="opacity-90 font-mono text-[10px] flex-shrink-0">
                   {arg.timeText}

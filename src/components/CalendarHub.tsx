@@ -7,6 +7,14 @@ import { FilterToolbar } from './FilterToolbar';
 import { CalendarView } from './CalendarView';
 import { EventModal } from './EventModal';
 import { SubscribeModal } from './SubscribeModal';
+import {
+  MasonicEmblem,
+  EasternStarEmblem,
+  TaxExemptBadge,
+  LocationBadge,
+  FiveColorOesStrip,
+} from './FraternalEmblems';
+import { ShieldCheck, MapPin, Calendar, CheckCircle2 } from 'lucide-react';
 
 interface CalendarHubProps {
   initialData: EventsApiResponse;
@@ -94,7 +102,7 @@ export function CalendarHub({ initialData }: CalendarHubProps) {
   };
 
   return (
-    <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 flex flex-col font-sans transition-colors">
+    <div className="min-h-screen bg-[#F8F9FA] dark:bg-[#07192F] text-[#1A1D20] dark:text-[#F8F9FA] flex flex-col font-body transition-colors">
       {/* Top Header */}
       <Header
         totalEvents={events.length}
@@ -130,6 +138,103 @@ export function CalendarHub({ initialData }: CalendarHubProps) {
           onEventClick={(ev) => setSelectedEvent(ev)}
         />
       </main>
+
+      {/* Dignified Fraternal Institutional Footer */}
+      <footer className="w-full bg-[#0B2545] border-t-2 border-[#D4AF37] text-white mt-12">
+        <FiveColorOesStrip className="h-1 w-full" />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 pb-8 border-b border-slate-700/80">
+            {/* Column 1: Heritage & Dignity */}
+            <div className="space-y-3.5">
+              <div className="flex items-center gap-2.5">
+                <div className="p-1 rounded-xl bg-[#003366] border border-[#D4AF37] flex items-center justify-center">
+                  <MasonicEmblem className="w-6 h-6" color="#D4AF37" strokeWidth={2} />
+                </div>
+                <div className="p-1 rounded-xl bg-[#003366] border border-[#D4AF37] flex items-center justify-center">
+                  <EasternStarEmblem className="w-6 h-6" />
+                </div>
+                <div className="ml-1">
+                  <div className="font-bold text-sm tracking-tight text-white font-heading">
+                    Prince Hall Masonic Temple
+                  </div>
+                  <div className="text-[11px] text-[#D4AF37] font-semibold">
+                    1000 U Street NW • Washington, D.C.
+                  </div>
+                </div>
+              </div>
+              <p className="text-xs text-slate-300 leading-relaxed">
+                Reflecting the historic 1825 origins of Prince Hall Freemasonry in the District of Columbia and multi-generational Black institutional stewardship.
+              </p>
+              <div className="flex flex-wrap gap-2 pt-1">
+                <TaxExemptBadge />
+                <LocationBadge />
+              </div>
+            </div>
+
+            {/* Column 2: Fraternal Governance & Unity */}
+            <div className="space-y-3">
+              <h2 className="text-xs font-bold uppercase tracking-wider text-[#D4AF37] font-heading">
+                Fraternal Leadership &amp; Entities
+              </h2>
+              <ul className="text-xs space-y-2 text-slate-300">
+                <li className="flex items-start gap-2">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-[#D4AF37] mt-0.5 flex-shrink-0" />
+                  <span>
+                    <strong className="text-white">MWPHGLDC:</strong> Most Worshipful Prince Hall Grand Lodge of D.C. (Est. 1825)
+                  </span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-[#D4AF37] mt-0.5 flex-shrink-0" />
+                  <span>
+                    <strong className="text-white">GTGC:</strong> Georgiana Thomas Grand Chapter, Order of the Eastern Star, PHA
+                  </span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-[#D4AF37] mt-0.5 flex-shrink-0" />
+                  <span>
+                    <strong className="text-white">PHFAMOESCEF:</strong> Charitable &amp; Educational Foundation (501c3)
+                  </span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-[#D4AF37] mt-0.5 flex-shrink-0" />
+                  <span>
+                    <strong className="text-white">CEF THC:</strong> Temple Holding Corporation
+                  </span>
+                </li>
+              </ul>
+            </div>
+
+            {/* Column 3: Live Sync Feeds & Accessibility */}
+            <div className="space-y-3">
+              <h2 className="text-xs font-bold uppercase tracking-wider text-[#D4AF37] font-heading">
+                Accessibility &amp; Standards
+              </h2>
+              <p className="text-xs text-slate-300 leading-relaxed">
+                Engineered to meet <strong>WCAG 2.1 AA</strong> contrast standards with screen-reader landmark compatibility, relative typography scaling, and high-visibility keyboard focus management.
+              </p>
+              <div className="pt-2">
+                <button
+                  onClick={() => setIsSubscribeOpen(true)}
+                  className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold bg-[#D4AF37] hover:bg-[#B8952E] text-[#0B2545] transition-all transform hover:scale-[1.02] shadow-[0_0_12px_rgba(212,175,55,0.25)] focus:outline-none focus:ring-2 focus:ring-[#D4AF37]"
+                >
+                  <Calendar className="w-3.5 h-3.5 text-[#0B2545]" />
+                  <span>Subscribe to Feeds (webcal://)</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Bottom Copyright & Mission Line */}
+          <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-400">
+            <div>
+              © {new Date().getFullYear()} Prince Hall Masonic Temple (PHFAMOESCEF) &amp; The MWPHGLDC / GTGC Jurisdiction.
+            </div>
+            <div className="text-[11px] text-[#D4AF37]/90 font-medium">
+              Heritage • Dignity • Fraternal Unity • Community Impact
+            </div>
+          </div>
+        </div>
+      </footer>
 
       {/* Event Detail Modal */}
       <EventModal

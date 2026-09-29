@@ -1,21 +1,42 @@
 import type { Metadata } from 'next';
-import { Geist, Geist_Mono } from 'next/font/google';
+import { Plus_Jakarta_Sans, Inter, JetBrains_Mono } from 'next/font/google';
 import './globals.css';
 
-const geistSans = Geist({
-  variable: '--font-geist-sans',
+const plusJakartaSans = Plus_Jakarta_Sans({
+  variable: '--font-heading',
   subsets: ['latin'],
+  weight: ['500', '600', '700', '800'],
+  display: 'swap',
 });
 
-const geistMono = Geist_Mono({
-  variable: '--font-geist-mono',
+const inter = Inter({
+  variable: '--font-body',
   subsets: ['latin'],
+  weight: ['400', '500', '600', '700'],
+  display: 'swap',
+});
+
+const jetbrainsMono = JetBrains_Mono({
+  variable: '--font-mono',
+  subsets: ['latin'],
+  weight: ['400', '500', '600'],
+  display: 'swap',
 });
 
 export const metadata: Metadata = {
-  title: 'Community Calendar Overlay Hub | Unified Non-Profit Events',
+  title: 'MWPHGLDC & GTGC | Prince Hall Masonic Temple (PHFAMOESCEF) Jurisdictional Calendar',
   description:
-    'High-performance unified calendar aggregation site for community non-profit organizations. Filter by organization, explore interactive schedules, and subscribe directly via webcal.',
+    'Official unified jurisdictional calendar for the Most Worshipful Prince Hall Grand Lodge of DC, Georgiana Thomas Grand Chapter O.E.S., and the Prince Hall Masonic Temple / PHFAMOESCEF at 1000 U Street NW, Washington, D.C.',
+  keywords: [
+    'Prince Hall',
+    'MWPHGLDC',
+    'Georgiana Thomas Grand Chapter',
+    'OES',
+    'PHFAMOESCEF',
+    '1000 U Street NW',
+    'Masonic Temple Washington DC',
+    'Masonic Calendar',
+  ],
 };
 
 export default function RootLayout({
@@ -26,9 +47,11 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${plusJakartaSans.variable} ${inter.variable} ${jetbrainsMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col bg-zinc-50 dark:bg-zinc-950">{children}</body>
+      <body className="min-h-full flex flex-col bg-[#F8F9FA] dark:bg-[#07192F] text-[#1A1D20] dark:text-[#F8F9FA] font-body selection:bg-[#D4AF37] selection:text-[#0B2545]">
+        {children}
+      </body>
     </html>
   );
 }
