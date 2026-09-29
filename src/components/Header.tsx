@@ -60,31 +60,42 @@ export function Header({
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-3.5">
             {/* Logo Area: Official Organization Logos */}
             <div className="flex items-center gap-3.5">
-              {/* Official Logos Side-by-Side */}
+              {/* Official Logos Side-by-Side: CEF, THC, MWPHGLDC, GTGC */}
               <div
-                className="flex items-center justify-center gap-2 p-1.5 rounded-2xl bg-white/10 dark:bg-white/5 border border-[#D4AF37]/50 shadow-[0_0_15px_rgba(212,175,55,0.2)] flex-shrink-0"
-                title="MWPHGLDC, GTGC, PHFAMOESCEF, and THC Official Brand Emblems"
+                className="flex items-center justify-center gap-1.5 sm:gap-2 p-1.5 rounded-2xl bg-white/10 dark:bg-white/5 border border-[#D4AF37]/50 shadow-[0_0_15px_rgba(212,175,55,0.2)] flex-shrink-0"
+                title="PHFAMOESCEF, CEF THC, MWPHGLDC, and GTGC Official Brand Emblems"
               >
+                {/* 1. CEF Logo */}
+                <Image
+                  src="/cef_logo.jpeg"
+                  alt="PHFAMOESCEF Official Logo"
+                  width={36}
+                  height={36}
+                  className="w-7.5 h-7.5 sm:w-8.5 sm:h-8.5 rounded-full object-contain bg-white p-0.5 border border-[#D4AF37]/40"
+                />
+                {/* 2. THC Logo */}
+                <Image
+                  src="/cef_thc_logo.png"
+                  alt="CEF THC - Temple Holding Corporation"
+                  width={36}
+                  height={36}
+                  className="w-7.5 h-7.5 sm:w-8.5 sm:h-8.5 rounded-full object-contain bg-white p-0.5 border border-[#D4AF37]/40"
+                />
+                {/* 3. MWPHGLDC Logo */}
                 <Image
                   src="/mwphgldc_logo.png"
                   alt="Most Worshipful Prince Hall Grand Lodge of DC"
-                  width={34}
-                  height={34}
-                  className="w-8.5 h-8.5 rounded-full object-contain bg-white p-0.5"
+                  width={36}
+                  height={36}
+                  className="w-7.5 h-7.5 sm:w-8.5 sm:h-8.5 rounded-full object-contain bg-white p-0.5 border border-[#D4AF37]/40"
                 />
+                {/* 4. GTGC Logo */}
                 <Image
                   src="/gtgc_logo.jpg"
                   alt="Georgiana Thomas Grand Chapter O.E.S."
-                  width={34}
-                  height={34}
-                  className="w-8.5 h-8.5 rounded-full object-contain bg-white p-0.5"
-                />
-                <Image
-                  src="/cef_thc_logo.png"
-                  alt="CEF THC - Prince Hall Masonic Temple"
-                  width={34}
-                  height={34}
-                  className="w-8.5 h-8.5 rounded-full object-contain bg-white p-0.5 hidden sm:block"
+                  width={36}
+                  height={36}
+                  className="w-7.5 h-7.5 sm:w-8.5 sm:h-8.5 rounded-full object-contain bg-white p-0.5 border border-[#D4AF37]/40"
                 />
               </div>
 

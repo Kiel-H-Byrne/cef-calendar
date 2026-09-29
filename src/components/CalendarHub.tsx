@@ -144,29 +144,40 @@ export function CalendarHub({ initialData }: CalendarHubProps) {
         <FiveColorOesStrip className="h-1 w-full" />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 pb-8 border-b border-slate-700/80">
-            {/* Column 1: Heritage & Dignity with Official Logos */}
+            {/* Column 1: Heritage & Dignity with All Four Official Logos */}
             <div className="space-y-3.5">
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
+                {/* 1. CEF Logo */}
                 <Image
-                  src="/mwphgldc_logo.png"
-                  alt="MWPHGLDC"
+                  src="/cef_logo.jpeg"
+                  alt="PHFAMOESCEF Official Logo"
                   width={34}
                   height={34}
-                  className="w-8.5 h-8.5 rounded-full bg-white object-contain p-0.5 border border-[#D4AF37]"
+                  className="w-8 h-8 rounded-full bg-white object-contain p-0.5 border border-[#D4AF37]"
                 />
-                <Image
-                  src="/gtgc_logo.jpg"
-                  alt="GTGC OES"
-                  width={34}
-                  height={34}
-                  className="w-8.5 h-8.5 rounded-full bg-white object-contain p-0.5 border border-[#D4AF37]"
-                />
+                {/* 2. THC Logo */}
                 <Image
                   src="/cef_thc_logo.png"
-                  alt="CEF THC"
+                  alt="CEF THC Official Logo"
                   width={34}
                   height={34}
-                  className="w-8.5 h-8.5 rounded-full bg-white object-contain p-0.5 border border-[#D4AF37]"
+                  className="w-8 h-8 rounded-full bg-white object-contain p-0.5 border border-[#D4AF37]"
+                />
+                {/* 3. MWPHGLDC Logo */}
+                <Image
+                  src="/mwphgldc_logo.png"
+                  alt="MWPHGLDC Official Logo"
+                  width={34}
+                  height={34}
+                  className="w-8 h-8 rounded-full bg-white object-contain p-0.5 border border-[#D4AF37]"
+                />
+                {/* 4. GTGC Logo */}
+                <Image
+                  src="/gtgc_logo.jpg"
+                  alt="GTGC OES Official Logo"
+                  width={34}
+                  height={34}
+                  className="w-8 h-8 rounded-full bg-white object-contain p-0.5 border border-[#D4AF37]"
                 />
                 <div className="ml-1">
                   <div className="font-bold text-sm tracking-tight text-white font-heading">
@@ -187,36 +198,12 @@ export function CalendarHub({ initialData }: CalendarHubProps) {
               </div>
             </div>
 
-            {/* Column 2: Fraternal Governance & Entities */}
+            {/* Column 2: Fraternal Governance & Entities in Order (CEF, THC, MWPHGLDC, GTGC) */}
             <div className="space-y-3">
               <h2 className="text-xs font-bold uppercase tracking-wider text-[#D4AF37] font-heading">
                 Fraternal Leadership &amp; Entities
               </h2>
               <ul className="text-xs space-y-2 text-slate-300">
-                <li className="flex items-center gap-2">
-                  <Image
-                    src="/mwphgldc_logo.png"
-                    alt="MWPHGLDC"
-                    width={18}
-                    height={18}
-                    className="w-4.5 h-4.5 rounded-full bg-white object-contain"
-                  />
-                  <span>
-                    <strong className="text-white">MWPHGLDC:</strong> Most Worshipful Prince Hall Grand Lodge of D.C. (Est. 1825)
-                  </span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <Image
-                    src="/gtgc_logo.jpg"
-                    alt="GTGC"
-                    width={18}
-                    height={18}
-                    className="w-4.5 h-4.5 rounded-full bg-white object-contain"
-                  />
-                  <span>
-                    <strong className="text-white">GTGC:</strong> Georgiana Thomas Grand Chapter, Order of the Eastern Star, PHA
-                  </span>
-                </li>
                 <li className="flex items-center gap-2">
                   <Image
                     src="/cef_logo.jpeg"
@@ -239,6 +226,30 @@ export function CalendarHub({ initialData }: CalendarHubProps) {
                   />
                   <span>
                     <strong className="text-white">CEF THC:</strong> Temple Holding Corporation (1000 U St NW)
+                  </span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <Image
+                    src="/mwphgldc_logo.png"
+                    alt="MWPHGLDC"
+                    width={18}
+                    height={18}
+                    className="w-4.5 h-4.5 rounded-full bg-white object-contain"
+                  />
+                  <span>
+                    <strong className="text-white">MWPHGLDC:</strong> Most Worshipful Prince Hall Grand Lodge of D.C. (Est. 1825)
+                  </span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <Image
+                    src="/gtgc_logo.jpg"
+                    alt="GTGC"
+                    width={18}
+                    height={18}
+                    className="w-4.5 h-4.5 rounded-full bg-white object-contain"
+                  />
+                  <span>
+                    <strong className="text-white">GTGC:</strong> Georgiana Thomas Grand Chapter, Order of the Eastern Star, PHA
                   </span>
                 </li>
               </ul>

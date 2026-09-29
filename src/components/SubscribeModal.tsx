@@ -73,18 +73,32 @@ export function SubscribeModal({ sources, isOpen, onClose }: SubscribeModalProps
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-1.5 p-1 rounded-xl bg-white/10 border border-[#D4AF37]/50 shadow-[0_0_10px_rgba(212,175,55,0.2)]">
               <Image
+                src="/cef_logo.jpeg"
+                alt="PHFAMOESCEF"
+                width={28}
+                height={28}
+                className="w-7 h-7 rounded-full bg-white object-contain p-0.5 border border-[#D4AF37]/40"
+              />
+              <Image
+                src="/cef_thc_logo.png"
+                alt="CEF THC"
+                width={28}
+                height={28}
+                className="w-7 h-7 rounded-full bg-white object-contain p-0.5 border border-[#D4AF37]/40"
+              />
+              <Image
                 src="/mwphgldc_logo.png"
                 alt="MWPHGLDC"
                 width={28}
                 height={28}
-                className="w-7 h-7 rounded-full bg-white object-contain p-0.5"
+                className="w-7 h-7 rounded-full bg-white object-contain p-0.5 border border-[#D4AF37]/40"
               />
               <Image
                 src="/gtgc_logo.jpg"
                 alt="GTGC OES"
                 width={28}
                 height={28}
-                className="w-7 h-7 rounded-full bg-white object-contain p-0.5"
+                className="w-7 h-7 rounded-full bg-white object-contain p-0.5 border border-[#D4AF37]/40"
               />
             </div>
             <div>

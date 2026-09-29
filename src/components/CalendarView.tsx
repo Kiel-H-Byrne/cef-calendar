@@ -73,7 +73,7 @@ export function CalendarView({
     end: ev.end,
     allDay: ev.allDay,
     backgroundColor: ev.backgroundColor,
-    borderColor: ev.borderColor,
+    borderColor: ev.backgroundColor,
     textColor: ev.textColor,
     extendedProps: {
       rawEvent: ev,
@@ -107,6 +107,16 @@ export function CalendarView({
         }}
         events={fullCalendarEvents}
         eventClick={handleEventClick}
+        eventDidMount={(info) => {
+          if (info.view.type.startsWith('list')) {
+            const dot = info.el.querySelector('.fc-list-event-dot') as HTMLElement | null;
+            const raw = info.event.extendedProps?.rawEvent as UnifiedCalendarEvent | undefined;
+            const color = raw?.backgroundColor || info.event.backgroundColor;
+            if (dot && color) {
+              dot.style.borderColor = color;
+            }
+          }
+        }}
         navLinks={true}
         editable={false}
         selectable={false}
