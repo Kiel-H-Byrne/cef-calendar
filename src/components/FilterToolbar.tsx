@@ -16,7 +16,7 @@ import {
   AlertTriangle,
 } from 'lucide-react';
 import { OrgCalendarConfig, UnifiedCalendarEvent } from '@/config/calendars';
-import { EasternStarEmblem, MasonicEmblem } from './FraternalEmblems';
+import { OrgLogo } from './FraternalEmblems';
 
 interface FilterToolbarProps {
   sources: OrgCalendarConfig[];
@@ -194,7 +194,7 @@ export function FilterToolbar({
                         Sync Jurisdictional Calendar
                       </div>
                       <div className="text-[11px] text-[#D4AF37]">
-                        Direct feed via webcal:// standard
+                        Direct calendar sync
                       </div>
                     </div>
 
@@ -207,7 +207,7 @@ export function FilterToolbar({
                         <Smartphone className="w-4 h-4 text-[#003366] dark:text-[#D4AF37]" />
                         <div>
                           <div className="font-semibold text-[#0B2545] dark:text-white">Apple / Outlook</div>
-                          <div className="text-[10px] text-slate-400">One-click desktop/mobile sync</div>
+                          <div className="text-[10px] text-slate-400">One-click calendar sync</div>
                         </div>
                       </a>
 
@@ -233,8 +233,8 @@ export function FilterToolbar({
                       >
                         <Download className="w-4 h-4 text-slate-400" />
                         <div>
-                          <div className="font-semibold text-[#0B2545] dark:text-white">Download Master .ics</div>
-                          <div className="text-[10px] text-slate-400">Standard RFC 5545 file export</div>
+                          <div className="font-semibold text-[#0B2545] dark:text-white">Download Calendar File (.ics)</div>
+                          <div className="text-[10px] text-slate-400">Offline calendar backup</div>
                         </div>
                       </a>
 
@@ -245,8 +245,8 @@ export function FilterToolbar({
                         <div className="flex items-center gap-2.5">
                           <Copy className="w-4 h-4 text-slate-400" />
                           <div>
-                            <div className="font-semibold text-[#0B2545] dark:text-white">Copy webcal URL</div>
-                            <div className="text-[10px] text-slate-400">Paste in any calendar app</div>
+                            <div className="font-semibold text-[#0B2545] dark:text-white">Copy Calendar Link</div>
+                            <div className="text-[10px] text-slate-400">Paste in Apple, Outlook, or Google</div>
                           </div>
                         </div>
                         {copiedKey === 'quick-copy' && (
@@ -274,7 +274,7 @@ export function FilterToolbar({
         </div>
       </div>
 
-      {/* Organization Filter Badges with Distinct Colors */}
+      {/* Organization Filter Badges with Official Logos and Distinct Colors */}
       <div className="flex flex-wrap items-center gap-2 pt-0.5">
         <div className="flex items-center gap-1.5 text-xs text-[#0B2545] dark:text-[#D4AF37] mr-1 font-bold">
           <SlidersHorizontal className="w-3.5 h-3.5 text-[#D4AF37]" />
@@ -284,8 +284,6 @@ export function FilterToolbar({
         {sources.map((src) => {
           const isSelected = selectedOrgIds.has(src.id);
           const count = orgEventCounts[src.id] || 0;
-          const isOes = src.id === 'org-delta';
-          const isMasonic = src.id === 'org-alpha' || src.id === 'org-epsilon';
 
           return (
             <button
@@ -304,7 +302,7 @@ export function FilterToolbar({
               aria-pressed={isSelected}
               aria-label={`Filter by ${src.name}`}
             >
-              {/* Checkmark or Colored Pip Indicator */}
+              {/* Checkmark or Colored Pip */}
               <span
                 className={`w-3.5 h-3.5 rounded-full flex items-center justify-center transition-colors flex-shrink-0 ${
                   isSelected
@@ -320,12 +318,8 @@ export function FilterToolbar({
                 ) : null}
               </span>
 
-              {isOes && (
-                <EasternStarEmblem className="w-3.5 h-3.5 flex-shrink-0" />
-              )}
-              {isMasonic && isSelected && (
-                <MasonicEmblem className="w-3.5 h-3.5 flex-shrink-0" color="#D4AF37" strokeWidth={2.5} />
-              )}
+              {/* Official Brand Logo */}
+              <OrgLogo orgId={src.id} size={20} className="w-5 h-5 flex-shrink-0" />
 
               <span className="font-semibold">{src.name}</span>
 

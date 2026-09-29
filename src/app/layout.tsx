@@ -24,15 +24,17 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://www.phfamoescef.com'),
   title: 'MWPHGLDC & GTGC | Prince Hall Masonic Temple (PHFAMOESCEF) Jurisdictional Calendar',
   description:
-    'Official unified jurisdictional calendar for the Most Worshipful Prince Hall Grand Lodge of DC, Georgiana Thomas Grand Chapter O.E.S., and the Prince Hall Masonic Temple / PHFAMOESCEF at 1000 U Street NW, Washington, D.C.',
+    'Official unified jurisdictional calendar for the Most Worshipful Prince Hall Grand Lodge of DC, Georgiana Thomas Grand Chapter O.E.S., and the Prince Hall Masonic Temple / PHFAMOESCEF at 1000 U Street NW, Washington, D.C. Visit phfamoescef.com for more information.',
   keywords: [
     'Prince Hall',
     'MWPHGLDC',
     'Georgiana Thomas Grand Chapter',
     'OES',
     'PHFAMOESCEF',
+    'phfamoescef.com',
     '1000 U Street NW',
     'Masonic Temple Washington DC',
     'Masonic Calendar',

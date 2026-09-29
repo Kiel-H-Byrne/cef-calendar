@@ -1,11 +1,11 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import Image from 'next/image';
 import {
   Check,
   Copy,
   Download,
-  Rss,
   X,
   Smartphone,
   Globe,
@@ -13,10 +13,10 @@ import {
 } from 'lucide-react';
 import { OrgCalendarConfig } from '@/config/calendars';
 import {
-  MasonicEmblem,
-  EasternStarEmblem,
   TaxExemptBadge,
   LocationBadge,
+  WebsiteLinkBadge,
+  OrgLogo,
 } from './FraternalEmblems';
 
 interface SubscribeModalProps {
@@ -41,7 +41,7 @@ export function SubscribeModal({ sources, isOpen, onClose }: SubscribeModalProps
 
   if (!isOpen) return null;
 
-  const hostWithProto = origin || 'http://localhost:3000';
+  const hostWithProto = origin || 'https://www.phfamoescef.com';
   const masterHttpUrl = `${hostWithProto}/api/calendar/master.ics`;
   const masterWebcalUrl = masterHttpUrl.replace(/^https?:\/\//i, 'webcal://');
   const googleSubscribeUrl = `https://calendar.google.com/calendar/r?cid=${encodeURIComponent(masterHttpUrl)}`;
@@ -68,11 +68,24 @@ export function SubscribeModal({ sources, isOpen, onClose }: SubscribeModalProps
         className="relative w-full max-w-xl bg-white dark:bg-[#0B2545] rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700 overflow-hidden max-h-[92vh] flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Modal Header */}
+        {/* Modal Header with Official Brand Logos */}
         <div className="p-5 sm:p-6 bg-[#0B2545] border-b border-[#D4AF37] flex items-center justify-between text-white">
           <div className="flex items-center gap-3">
-            <div className="p-2.5 rounded-xl bg-[#003366] text-[#D4AF37] border border-[#D4AF37]/50 shadow-[0_0_10px_rgba(212,175,55,0.2)]">
-              <Rss className="w-5 h-5" />
+            <div className="flex items-center gap-1.5 p-1 rounded-xl bg-white/10 border border-[#D4AF37]/50 shadow-[0_0_10px_rgba(212,175,55,0.2)]">
+              <Image
+                src="/mwphgldc_logo.png"
+                alt="MWPHGLDC"
+                width={28}
+                height={28}
+                className="w-7 h-7 rounded-full bg-white object-contain p-0.5"
+              />
+              <Image
+                src="/gtgc_logo.jpg"
+                alt="GTGC OES"
+                width={28}
+                height={28}
+                className="w-7 h-7 rounded-full bg-white object-contain p-0.5"
+              />
             </div>
             <div>
               <h2
@@ -82,7 +95,7 @@ export function SubscribeModal({ sources, isOpen, onClose }: SubscribeModalProps
                 Subscribe to Jurisdictional Calendars
               </h2>
               <p className="text-xs text-slate-300 mt-0.5">
-                Sync live schedules to Apple Calendar, Microsoft Outlook, or Google Calendar
+                Sync live schedules directly to Apple Calendar, Microsoft Outlook, or Google Calendar
               </p>
             </div>
           </div>
@@ -105,7 +118,7 @@ export function SubscribeModal({ sources, isOpen, onClose }: SubscribeModalProps
                   <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#D4AF37]"></span>
                 </span>
                 <span className="font-bold text-[#0B2545] dark:text-[#F8F9FA] text-sm font-heading">
-                  Master Jurisdictional Feed (All Organizations)
+                  Master Jurisdictional Calendar (All Feeds)
                 </span>
               </div>
               <span className="text-[10px] font-mono uppercase bg-[#003366] text-[#D4AF37] border border-[#D4AF37]/40 px-2 py-0.5 rounded font-bold">
@@ -114,17 +127,18 @@ export function SubscribeModal({ sources, isOpen, onClose }: SubscribeModalProps
             </div>
 
             <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
-              Aggregates all jurisdictional events from MWPHGLDC, Georgiana Thomas Grand Chapter O.E.S., and the Prince Hall Masonic Temple (PHFAMOESCEF).
+              Unified schedule across MWPHGLDC, Georgiana Thomas Grand Chapter O.E.S., and the Prince Hall Masonic Temple (PHFAMOESCEF).
             </p>
 
-            {/* URL Display with Copy */}
+            {/* Direct Calendar Link Display with Copy */}
             <div className="flex items-center gap-2 p-1.5 pl-3 bg-white dark:bg-[#0B2545] rounded-lg border border-slate-300 dark:border-slate-700 text-xs">
               <code className="font-mono text-slate-700 dark:text-slate-200 truncate flex-1 select-all text-[11px]">
-                {masterWebcalUrl}
+                {masterHttpUrl}
               </code>
               <button
                 onClick={() => handleCopy(masterWebcalUrl, 'master-webcal')}
                 className="inline-flex items-center gap-1 px-3 py-1.5 rounded-md bg-slate-100 dark:bg-[#003366] hover:bg-slate-200 dark:hover:bg-[#07192F] text-[#003366] dark:text-[#D4AF37] font-bold transition-colors flex-shrink-0 focus:outline-none focus:ring-1 focus:ring-[#D4AF37]"
+                title="Copy calendar subscription link"
               >
                 {copiedKey === 'master-webcal' ? (
                   <>
@@ -134,7 +148,7 @@ export function SubscribeModal({ sources, isOpen, onClose }: SubscribeModalProps
                 ) : (
                   <>
                     <Copy className="w-3.5 h-3.5" />
-                    Copy
+                    Copy Link
                   </>
                 )}
               </button>
@@ -166,7 +180,7 @@ export function SubscribeModal({ sources, isOpen, onClose }: SubscribeModalProps
                 className="inline-flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-semibold rounded-lg bg-white dark:bg-[#0B2545] border border-slate-300 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-[#07192F] text-slate-700 dark:text-slate-200 transition-colors text-center focus:outline-none focus:ring-2 focus:ring-[#D4AF37]"
               >
                 <Download className="w-3.5 h-3.5 text-slate-500" />
-                Export .ics
+                Download (.ics)
               </a>
             </div>
           </div>
@@ -183,7 +197,6 @@ export function SubscribeModal({ sources, isOpen, onClose }: SubscribeModalProps
                 const orgWebcal = `${hostWithProto}/api/calendar/${src.id}`.replace(/^https?:\/\//i, 'webcal://');
                 const orgIcsUrl = `${hostWithProto}/api/calendar/${src.id}`;
                 const orgGoogleUrl = `https://calendar.google.com/calendar/r?cid=${encodeURIComponent(orgIcsUrl)}`;
-                const isOes = src.id === 'org-delta';
 
                 return (
                   <div
@@ -191,11 +204,7 @@ export function SubscribeModal({ sources, isOpen, onClose }: SubscribeModalProps
                     className="p-3.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/70 dark:bg-[#07192F]/60 hover:bg-slate-100 dark:hover:bg-[#07192F] transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-3"
                   >
                     <div className="flex items-center gap-3">
-                      {isOes ? (
-                        <EasternStarEmblem className="w-5 h-5 flex-shrink-0" />
-                      ) : (
-                        <MasonicEmblem className="w-5 h-5 flex-shrink-0" color={src.color.primary === '#003366' ? '#D4AF37' : src.color.primary} />
-                      )}
+                      <OrgLogo orgId={src.id} size={24} className="w-6 h-6 flex-shrink-0" />
                       <div>
                         <div className="text-sm font-bold text-[#0B2545] dark:text-[#F8F9FA]">
                           {src.name}
@@ -210,7 +219,7 @@ export function SubscribeModal({ sources, isOpen, onClose }: SubscribeModalProps
                       <a
                         href={orgWebcal}
                         className="px-3 py-1.5 text-xs font-bold rounded-lg bg-white dark:bg-[#0B2545] border border-slate-300 dark:border-slate-700 hover:border-[#D4AF37] text-[#003366] dark:text-[#D4AF37] transition-colors shadow-2xs focus:outline-none focus:ring-1 focus:ring-[#D4AF37]"
-                        title={`Subscribe to ${src.name} via webcal`}
+                        title={`Subscribe to ${src.name}`}
                       >
                         Subscribe
                       </a>
@@ -226,7 +235,7 @@ export function SubscribeModal({ sources, isOpen, onClose }: SubscribeModalProps
                       <button
                         onClick={() => handleCopy(orgWebcal, src.id)}
                         className="p-1.5 text-slate-500 hover:text-[#0B2545] dark:hover:text-white rounded-lg hover:bg-slate-200 dark:hover:bg-[#003366] transition-colors focus:outline-none focus:ring-1 focus:ring-[#D4AF37]"
-                        title="Copy feed URL"
+                        title="Copy feed link"
                         aria-label={`Copy feed link for ${src.name}`}
                       >
                         {copiedKey === src.id ? (
@@ -243,11 +252,12 @@ export function SubscribeModal({ sources, isOpen, onClose }: SubscribeModalProps
           </div>
         </div>
 
-        {/* Modal Footer */}
-        <div className="p-4 bg-slate-50 dark:bg-[#07192F] border-t border-slate-200 dark:border-slate-800 flex items-center justify-between">
-          <div className="flex items-center gap-2">
+        {/* Modal Footer with phfamoescef.com link */}
+        <div className="p-4 bg-slate-50 dark:bg-[#07192F] border-t border-slate-200 dark:border-slate-800 flex items-center justify-between flex-wrap gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             <TaxExemptBadge />
             <LocationBadge />
+            <WebsiteLinkBadge />
           </div>
           <button
             onClick={onClose}

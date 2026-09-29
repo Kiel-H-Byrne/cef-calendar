@@ -14,7 +14,7 @@ import {
 } from 'lucide-react';
 import { UnifiedCalendarEvent } from '@/config/calendars';
 import { generateSingleEventIcs, getGoogleCalendarUrl } from '@/lib/icsGenerator';
-import { EasternStarEmblem, MasonicEmblem, FiveColorOesStrip } from './FraternalEmblems';
+import { FiveColorOesStrip, OrgLogo } from './FraternalEmblems';
 
 interface EventModalProps {
   event: UnifiedCalendarEvent | null;
@@ -210,21 +210,17 @@ export function EventModal({ event, onClose }: EventModalProps) {
         </button>
 
         <div className="p-6 overflow-y-auto space-y-6">
-          {/* Org Pill Badge */}
+          {/* Org Pill Badge with Official Logo */}
           <div className="flex items-center gap-2">
             <span
-              className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold tracking-wide shadow-xs border"
+              className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold tracking-wide shadow-xs border"
               style={{
                 backgroundColor: event.backgroundColor,
                 color: event.textColor,
                 borderColor: event.borderColor,
               }}
             >
-              {isOes ? (
-                <EasternStarEmblem className="w-3.5 h-3.5" />
-              ) : (
-                <MasonicEmblem className="w-3.5 h-3.5" color="#D4AF37" strokeWidth={2.5} />
-              )}
+              <OrgLogo orgId={event.orgId} size={18} className="w-4.5 h-4.5" />
               {event.orgName}
             </span>
           </div>

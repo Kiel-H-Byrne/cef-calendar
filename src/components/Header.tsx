@@ -1,12 +1,12 @@
 'use client';
 
 import React from 'react';
+import Image from 'next/image';
 import { Rss, Layers, ShieldCheck } from 'lucide-react';
 import {
-  MasonicEmblem,
-  EasternStarEmblem,
   TaxExemptBadge,
   LocationBadge,
+  WebsiteLinkBadge,
 } from './FraternalEmblems';
 
 interface HeaderProps {
@@ -45,28 +45,47 @@ export function Header({
             </span>
           </div>
 
-          {/* Badges: 501(c)(3) & Location */}
+          {/* Badges: 501(c)(3), Location, and Website phfamoescef.com */}
           <div className="flex items-center gap-2 flex-wrap justify-center">
             <TaxExemptBadge />
             <LocationBadge />
+            <WebsiteLinkBadge />
           </div>
         </div>
       </aside>
 
-      {/* Main Fraternal Header */}
+      {/* Main Fraternal Header with Official Brand Logos */}
       <nav aria-label="Primary Navigation" className="w-full bg-[#0B2545] border-b border-[#D4AF37] backdrop-blur-md">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 sm:py-4">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-3.5">
-            {/* Logo Area: Fraternal Emblems & Branding */}
+            {/* Logo Area: Official Organization Logos */}
             <div className="flex items-center gap-3.5">
-              {/* Dual Fraternal Emblems: Masonic & Eastern Star */}
+              {/* Official Logos Side-by-Side */}
               <div
-                className="flex items-center justify-center gap-1.5 p-1.5 rounded-2xl bg-[#003366] border border-[#D4AF37]/60 shadow-[0_0_15px_rgba(212,175,55,0.25)] flex-shrink-0"
-                title="MWPHGLDC (Masonic) & GTGC (Eastern Star) United in Leadership"
+                className="flex items-center justify-center gap-2 p-1.5 rounded-2xl bg-white/10 dark:bg-white/5 border border-[#D4AF37]/50 shadow-[0_0_15px_rgba(212,175,55,0.2)] flex-shrink-0"
+                title="MWPHGLDC, GTGC, PHFAMOESCEF, and THC Official Brand Emblems"
               >
-                <MasonicEmblem className="w-7 h-7" color="#D4AF37" strokeWidth={2} />
-                <div className="w-[1px] h-6 bg-[#D4AF37]/40" />
-                <EasternStarEmblem className="w-7 h-7" />
+                <Image
+                  src="/mwphgldc_logo.png"
+                  alt="Most Worshipful Prince Hall Grand Lodge of DC"
+                  width={34}
+                  height={34}
+                  className="w-8.5 h-8.5 rounded-full object-contain bg-white p-0.5"
+                />
+                <Image
+                  src="/gtgc_logo.jpg"
+                  alt="Georgiana Thomas Grand Chapter O.E.S."
+                  width={34}
+                  height={34}
+                  className="w-8.5 h-8.5 rounded-full object-contain bg-white p-0.5"
+                />
+                <Image
+                  src="/cef_thc_logo.png"
+                  alt="CEF THC - Prince Hall Masonic Temple"
+                  width={34}
+                  height={34}
+                  className="w-8.5 h-8.5 rounded-full object-contain bg-white p-0.5 hidden sm:block"
+                />
               </div>
 
               <div>
@@ -82,7 +101,7 @@ export function Header({
                 <p className="text-xs text-slate-300 tracking-wide mt-0.5">
                   <span className="text-[#D4AF37] font-semibold">MWPHGLDC</span> •{' '}
                   <span className="text-white font-medium">Georgiana Thomas Grand Chapter O.E.S.</span> •{' '}
-                  <span className="text-slate-300">PHFAMOESCEF THC</span> ({totalOrgs} Jurisdictional Feeds)
+                  <span className="text-slate-300">PHFAMOESCEF THC</span> ({totalOrgs} Feeds)
                 </p>
               </div>
             </div>
