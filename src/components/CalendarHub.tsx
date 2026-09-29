@@ -1,38 +1,49 @@
-'use client';
+"use client";
 
-import React, { useState } from 'react';
-import Image from 'next/image';
-import { OrgCalendarConfig, UnifiedCalendarEvent, EventsApiResponse } from '@/config/calendars';
-import { Header } from './Header';
-import { FilterToolbar } from './FilterToolbar';
-import { CalendarView } from './CalendarView';
-import { EventModal } from './EventModal';
-import { SubscribeModal } from './SubscribeModal';
 import {
-  TaxExemptBadge,
-  LocationBadge,
-  WebsiteLinkBadge,
+  EventsApiResponse,
+  OrgCalendarConfig,
+  UnifiedCalendarEvent,
+} from "@/config/calendars";
+import { Calendar, Globe } from "lucide-react";
+import Image from "next/image";
+import { useState } from "react";
+import { CalendarView } from "./CalendarView";
+import { EventModal } from "./EventModal";
+import { FilterToolbar } from "./FilterToolbar";
+import {
   FiveColorOesStrip,
-} from './FraternalEmblems';
-import { Calendar, Globe } from 'lucide-react';
+  LocationBadge,
+  TaxExemptBadge,
+  WebsiteLinkBadge,
+} from "./FraternalEmblems";
+import { Header } from "./Header";
+import { SubscribeModal } from "./SubscribeModal";
 
 interface CalendarHubProps {
   initialData: EventsApiResponse;
 }
 
 export function CalendarHub({ initialData }: CalendarHubProps) {
-  const [events, setEvents] = useState<UnifiedCalendarEvent[]>(initialData.events);
-  const [sources, setSources] = useState<OrgCalendarConfig[]>(initialData.sources);
+  const [events, setEvents] = useState<UnifiedCalendarEvent[]>(
+    initialData.events,
+  );
+  const [sources, setSources] = useState<OrgCalendarConfig[]>(
+    initialData.sources,
+  );
   const [warnings, setWarnings] = useState<string[]>(initialData.warnings);
-  const [lastUpdated, setLastUpdated] = useState<string>(initialData.lastUpdated);
+  const [lastUpdated, setLastUpdated] = useState<string>(
+    initialData.lastUpdated,
+  );
 
   // By default, select all organizations
   const [selectedOrgIds, setSelectedOrgIds] = useState<Set<string>>(
-    () => new Set(initialData.sources.map((s) => s.id))
+    () => new Set(initialData.sources.map((s) => s.id)),
   );
 
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedEvent, setSelectedEvent] = useState<UnifiedCalendarEvent | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedEvent, setSelectedEvent] =
+    useState<UnifiedCalendarEvent | null>(null);
   const [isSubscribeOpen, setIsSubscribeOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -64,7 +75,9 @@ export function CalendarHub({ initialData }: CalendarHubProps) {
     setIsLoading(true);
     try {
       // Bust any server ISR cache and fetch fresh external feeds
-      const res = await fetch('/api/events?refresh=true', { cache: 'no-store' });
+      const res = await fetch("/api/events?refresh=true", {
+        cache: "no-store",
+      });
       if (res.ok) {
         const data: EventsApiResponse = await res.json();
         setEvents(data.events);
@@ -92,10 +105,10 @@ export function CalendarHub({ initialData }: CalendarHubProps) {
         });
 
         // Trigger on-demand ISR revalidation in background
-        fetch('/api/revalidate', { method: 'POST' }).catch(() => {});
+        fetch("/api/revalidate", { method: "POST" }).catch(() => {});
       }
     } catch (err) {
-      console.error('Failed to refresh events:', err);
+      console.error("Failed to refresh events:", err);
     } finally {
       setIsLoading(false);
     }
@@ -189,7 +202,9 @@ export function CalendarHub({ initialData }: CalendarHubProps) {
                 </div>
               </div>
               <p className="text-xs text-slate-300 leading-relaxed">
-                Reflecting the historic 1825 origins of Prince Hall Freemasonry in the District of Columbia and multi-generational institutional stewardship.
+                Reflecting the historic 1825 origins of Prince Hall Freemasonry
+                in the District of Columbia and multi-generational institutional
+                stewardship.
               </p>
               <div className="flex flex-wrap gap-2 pt-1">
                 <TaxExemptBadge />
@@ -213,7 +228,8 @@ export function CalendarHub({ initialData }: CalendarHubProps) {
                     className="w-4.5 h-4.5 rounded-full bg-white object-contain"
                   />
                   <span>
-                    <strong className="text-white">PHFAMOESCEF:</strong> Charitable &amp; Educational Foundation (501c3)
+                    <strong className="text-white">PHFAMOESCEF:</strong>{" "}
+                    Charitable &amp; Educational Foundation (501c3)
                   </span>
                 </li>
                 <li className="flex items-center gap-2">
@@ -225,7 +241,8 @@ export function CalendarHub({ initialData }: CalendarHubProps) {
                     className="w-4.5 h-4.5 rounded-full bg-white object-contain"
                   />
                   <span>
-                    <strong className="text-white">CEF THC:</strong> Temple Holding Corporation (1000 U St NW)
+                    <strong className="text-white">CEF THC:</strong> Title
+                    Holding Corporation (1000 U St NW)
                   </span>
                 </li>
                 <li className="flex items-center gap-2">
@@ -237,7 +254,8 @@ export function CalendarHub({ initialData }: CalendarHubProps) {
                     className="w-4.5 h-4.5 rounded-full bg-white object-contain"
                   />
                   <span>
-                    <strong className="text-white">MWPHGLDC:</strong> Most Worshipful Prince Hall Grand Lodge of D.C. (Est. 1825)
+                    <strong className="text-white">MWPHGLDC:</strong> Most
+                    Worshipful Prince Hall Grand Lodge of D.C. (Est. 1825)
                   </span>
                 </li>
                 <li className="flex items-center gap-2">
@@ -249,7 +267,8 @@ export function CalendarHub({ initialData }: CalendarHubProps) {
                     className="w-4.5 h-4.5 rounded-full bg-white object-contain"
                   />
                   <span>
-                    <strong className="text-white">GTGC:</strong> Georgiana Thomas Grand Chapter, Order of the Eastern Star, PHA
+                    <strong className="text-white">GTGC:</strong> Georgiana
+                    Thomas Grand Chapter, Order of the Eastern Star, PHA
                   </span>
                 </li>
               </ul>
@@ -261,7 +280,10 @@ export function CalendarHub({ initialData }: CalendarHubProps) {
                 Calendar Integration &amp; Standards
               </h2>
               <p className="text-xs text-slate-300 leading-relaxed">
-                Connect your personal device or computer calendar. Compatible with Apple Calendar, Microsoft Outlook, and Google Calendar. Engineered to meet <strong>WCAG 2.1 AA</strong> accessibility standards.
+                Connect your personal device or computer calendar. Compatible
+                with Apple Calendar, Microsoft Outlook, and Google Calendar.
+                Engineered to meet <strong>WCAG 2.1 AA</strong> accessibility
+                standards.
               </p>
               <div className="pt-2">
                 <button
@@ -278,7 +300,10 @@ export function CalendarHub({ initialData }: CalendarHubProps) {
           {/* Bottom Copyright, Website Link, & Heritage Line */}
           <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-400">
             <div className="flex items-center gap-2 flex-wrap justify-center sm:justify-start">
-              <span>© {new Date().getFullYear()} Prince Hall Masonic Temple &amp; The MWPHGLDC / GTGC Jurisdiction.</span>
+              <span>
+                © {new Date().getFullYear()} Prince Hall Masonic Temple &amp;
+                The MWPHGLDC / GTGC Jurisdiction.
+              </span>
               <span>•</span>
               <a
                 href="https://www.phfamoescef.com"

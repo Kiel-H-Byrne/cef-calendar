@@ -1,5 +1,4 @@
-import React from 'react';
-import Image from 'next/image';
+import Image from "next/image";
 
 export interface OrgLogoInfo {
   src: string;
@@ -11,15 +10,30 @@ export interface OrgLogoInfo {
  * - mwphgldc_logo.png: Most Worshipful Prince Hall Grand Lodge of DC
  * - gtgc_logo.jpg: Georgiana Thomas Grand Chapter O.E.S.
  * - cef_logo.jpeg: PHFAMOESCEF
- * - cef_thc_logo.png: CEF THC (Temple Holding Corporation)
+ * - cef_thc_logo.png: CEF THC (Title Holding Corporation)
  */
 export const ORG_LOGOS: Record<string, OrgLogoInfo> = {
-  'org-alpha': { src: '/mwphgldc_logo.png', alt: 'Most Worshipful Prince Hall Grand Lodge of DC' },
-  'org-beta': { src: '/cef_logo.jpeg', alt: 'PHFAMOESCEF' },
-  'org-gamma': { src: '/cef_thc_logo.png', alt: 'CEF THC - Temple Holding Corporation' },
-  'org-delta': { src: '/gtgc_logo.jpg', alt: 'Georgiana Thomas Grand Chapter O.E.S.' },
-  'org-epsilon': { src: '/mwphgldc_logo.png', alt: 'MWPHGLDC Constituent Organizations' },
-  'org-zeta': { src: '/cef_thc_logo.png', alt: 'Prince Hall Masonic Temple - 1000 U St NW' },
+  "org-alpha": {
+    src: "/mwphgldc_logo.png",
+    alt: "Most Worshipful Prince Hall Grand Lodge of DC",
+  },
+  "org-beta": { src: "/cef_logo.jpeg", alt: "PHFAMOESCEF" },
+  "org-gamma": {
+    src: "/cef_thc_logo.png",
+    alt: "CEF THC - Title Holding Corporation",
+  },
+  "org-delta": {
+    src: "/gtgc_logo.jpg",
+    alt: "Georgiana Thomas Grand Chapter O.E.S.",
+  },
+  "org-epsilon": {
+    src: "/mwphgldc_logo.png",
+    alt: "MWPHGLDC Constituent Organizations",
+  },
+  "org-zeta": {
+    src: "/cef_thc_logo.png",
+    alt: "Prince Hall Masonic Temple - 1000 U St NW",
+  },
 };
 
 /**
@@ -27,7 +41,7 @@ export const ORG_LOGOS: Record<string, OrgLogoInfo> = {
  */
 export function OrgLogo({
   orgId,
-  className = 'w-5 h-5',
+  className = "w-5 h-5",
   size = 24,
 }: {
   orgId: string;
@@ -51,7 +65,11 @@ export function OrgLogo({
  * Refined 5-Color Eastern Star Accent Strip
  * Used for GTGC badges, cards, and accent dividers
  */
-export function FiveColorOesStrip({ className = 'h-1 w-full rounded-full' }: { className?: string }) {
+export function FiveColorOesStrip({
+  className = "h-1 w-full rounded-full",
+}: {
+  className?: string;
+}) {
   return (
     <div
       className={`grid grid-cols-5 overflow-hidden ${className}`}
@@ -71,12 +89,15 @@ export function FiveColorOesStrip({ className = 'h-1 w-full rounded-full' }: { c
  * 501(c)(3) Tax-Exempt Status Badge
  * Compliant with Brand Spec Section 5.D
  */
-export function TaxExemptBadge({ className = '' }: { className?: string }) {
+export function TaxExemptBadge({ className = "" }: { className?: string }) {
   return (
     <span
       className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold tracking-wide bg-[#FFFBEB] text-[#92400E] border border-[#FDE68A] shadow-xs ${className}`}
     >
-      <span className="w-1.5 h-1.5 rounded-full bg-[#D4AF37]" aria-hidden="true" />
+      <span
+        className="w-1.5 h-1.5 rounded-full bg-[#D4AF37]"
+        aria-hidden="true"
+      />
       501(c)(3) Tax-Exempt
     </span>
   );
@@ -86,12 +107,15 @@ export function TaxExemptBadge({ className = '' }: { className?: string }) {
  * Landmark Location Badge (1000 U St NW)
  * Compliant with Brand Spec Section 5.D
  */
-export function LocationBadge({ className = '' }: { className?: string }) {
+export function LocationBadge({ className = "" }: { className?: string }) {
   return (
     <span
       className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold tracking-wide bg-[#EFF6FF] text-[#1E40AF] border border-[#BFDBFE] shadow-xs ${className}`}
     >
-      <span className="w-1.5 h-1.5 rounded-full bg-[#1E40AF]" aria-hidden="true" />
+      <span
+        className="w-1.5 h-1.5 rounded-full bg-[#1E40AF]"
+        aria-hidden="true"
+      />
       1000 U Street NW • Washington, D.C.
     </span>
   );
@@ -100,7 +124,7 @@ export function LocationBadge({ className = '' }: { className?: string }) {
 /**
  * Official Website Link Badge for phfamoescef.com
  */
-export function WebsiteLinkBadge({ className = '' }: { className?: string }) {
+export function WebsiteLinkBadge({ className = "" }: { className?: string }) {
   return (
     <a
       href="https://www.phfamoescef.com"
@@ -109,7 +133,10 @@ export function WebsiteLinkBadge({ className = '' }: { className?: string }) {
       className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold tracking-wide bg-white dark:bg-[#0B2545] text-[#003366] dark:text-[#D4AF37] border border-slate-300 dark:border-slate-700 hover:border-[#D4AF37] transition-colors shadow-2xs ${className}`}
       title="Visit official website: phfamoescef.com"
     >
-      <span className="w-1.5 h-1.5 rounded-full bg-[#D4AF37]" aria-hidden="true" />
+      <span
+        className="w-1.5 h-1.5 rounded-full bg-[#D4AF37]"
+        aria-hidden="true"
+      />
       phfamoescef.com
     </a>
   );
@@ -119,8 +146,8 @@ export function WebsiteLinkBadge({ className = '' }: { className?: string }) {
  * Fallback Masonic Square and Compasses Vector Emblem
  */
 export function MasonicEmblem({
-  className = 'w-7 h-7',
-  color = '#D4AF37',
+  className = "w-7 h-7",
+  color = "#D4AF37",
   strokeWidth = 2,
 }: {
   className?: string;
@@ -177,7 +204,7 @@ export function MasonicEmblem({
  * Fallback Order of the Eastern Star (O.E.S.) Five-Pointed Star
  */
 export function EasternStarEmblem({
-  className = 'w-7 h-7',
+  className = "w-7 h-7",
 }: {
   className?: string;
 }) {
@@ -190,13 +217,50 @@ export function EasternStarEmblem({
       role="img"
       aria-label="Order of the Eastern Star Emblem"
     >
-      <circle cx="50" cy="50" r="47" stroke="#D4AF37" strokeWidth="2.5" fill="#0B2545" />
-      <polygon points="50,50 38,36 16,34 32,48" fill="#2980B9" stroke="#D4AF37" strokeWidth="1" />
-      <polygon points="50,50 62,36 84,34 68,48" fill="#F39C12" stroke="#D4AF37" strokeWidth="1" />
-      <polygon points="50,50 64,57 72,80 50,66" fill="#F8F9FA" stroke="#D4AF37" strokeWidth="1" />
-      <polygon points="50,50 50,66 50,92 40,68" fill="#27AE60" stroke="#D4AF37" strokeWidth="1" />
-      <polygon points="50,50 36,57 28,80 50,66" fill="#C0392B" stroke="#D4AF37" strokeWidth="1" />
-      <polygon points="50,42 58,47 55,56 45,56 42,47" fill="#D4AF37" stroke="#B8952E" strokeWidth="1" />
+      <circle
+        cx="50"
+        cy="50"
+        r="47"
+        stroke="#D4AF37"
+        strokeWidth="2.5"
+        fill="#0B2545"
+      />
+      <polygon
+        points="50,50 38,36 16,34 32,48"
+        fill="#2980B9"
+        stroke="#D4AF37"
+        strokeWidth="1"
+      />
+      <polygon
+        points="50,50 62,36 84,34 68,48"
+        fill="#F39C12"
+        stroke="#D4AF37"
+        strokeWidth="1"
+      />
+      <polygon
+        points="50,50 64,57 72,80 50,66"
+        fill="#F8F9FA"
+        stroke="#D4AF37"
+        strokeWidth="1"
+      />
+      <polygon
+        points="50,50 50,66 50,92 40,68"
+        fill="#27AE60"
+        stroke="#D4AF37"
+        strokeWidth="1"
+      />
+      <polygon
+        points="50,50 36,57 28,80 50,66"
+        fill="#C0392B"
+        stroke="#D4AF37"
+        strokeWidth="1"
+      />
+      <polygon
+        points="50,42 58,47 55,56 45,56 42,47"
+        fill="#D4AF37"
+        stroke="#B8952E"
+        strokeWidth="1"
+      />
       <circle cx="50" cy="50" r="3" fill="#0B2545" />
     </svg>
   );

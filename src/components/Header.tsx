@@ -1,13 +1,12 @@
-'use client';
+"use client";
 
-import React from 'react';
-import Image from 'next/image';
-import { Rss, Layers, ShieldCheck } from 'lucide-react';
+import { Layers, Rss, ShieldCheck } from "lucide-react";
+import Image from "next/image";
 import {
-  TaxExemptBadge,
   LocationBadge,
+  TaxExemptBadge,
   WebsiteLinkBadge,
-} from './FraternalEmblems';
+} from "./FraternalEmblems";
 
 interface HeaderProps {
   totalEvents: number;
@@ -24,15 +23,18 @@ export function Header({
 }: HeaderProps) {
   const formattedSyncTime = lastUpdated
     ? new Date(lastUpdated).toLocaleTimeString(undefined, {
-        hour: 'numeric',
-        minute: '2-digit',
+        hour: "numeric",
+        minute: "2-digit",
       })
     : null;
 
   return (
     <header className="w-full sticky top-0 z-30 shadow-md">
       {/* Top Announcement & Landmark Bar (Warm, High-Contrast Balance) */}
-      <aside aria-label="Announcement and Location Banner" className="w-full bg-[#FAF8F5] dark:bg-[#061527] border-b border-[#E7E2D7] dark:border-[#0B2545] text-slate-800 dark:text-zinc-300 py-1.5 px-4 sm:px-6 lg:px-8">
+      <aside
+        aria-label="Announcement and Location Banner"
+        className="w-full bg-[#FAF8F5] dark:bg-[#061527] border-b border-[#E7E2D7] dark:border-[#0B2545] text-slate-800 dark:text-zinc-300 py-1.5 px-4 sm:px-6 lg:px-8"
+      >
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-1.5 text-[11px]">
           {/* Heritage & Jurisdiction Note */}
           <div className="flex items-center gap-2 text-slate-800 dark:text-zinc-300 font-medium">
@@ -41,7 +43,8 @@ export function Header({
             </span>
             <span className="hidden sm:inline text-slate-400">•</span>
             <span className="hidden sm:inline">
-              Est. 1825 in the District of Columbia • Historic Black Institutional Stewardship
+              Est. 1825 in the District of Columbia • Historic Black
+              Institutional Stewardship
             </span>
           </div>
 
@@ -55,7 +58,10 @@ export function Header({
       </aside>
 
       {/* Main Fraternal Header with Official Brand Logos */}
-      <nav aria-label="Primary Navigation" className="w-full bg-[#0B2545] border-b border-[#D4AF37] backdrop-blur-md">
+      <nav
+        aria-label="Primary Navigation"
+        className="w-full bg-[#0B2545] border-b border-[#D4AF37] backdrop-blur-md"
+      >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 sm:py-4">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-3.5">
             {/* Logo Area: Official Organization Logos */}
@@ -76,7 +82,7 @@ export function Header({
                 {/* 2. THC Logo */}
                 <Image
                   src="/cef_thc_logo.png"
-                  alt="CEF THC - Temple Holding Corporation"
+                  alt="CEF THC - Title Holding Corporation"
                   width={36}
                   height={36}
                   className="w-7.5 h-7.5 sm:w-8.5 sm:h-8.5 rounded-full object-contain bg-white p-0.5 border border-[#D4AF37]/40"
@@ -110,9 +116,13 @@ export function Header({
                   </span>
                 </div>
                 <p className="text-xs text-slate-300 tracking-wide mt-0.5">
-                  <span className="text-[#D4AF37] font-semibold">MWPHGLDC</span> •{' '}
-                  <span className="text-white font-medium">Georgiana Thomas Grand Chapter O.E.S.</span> •{' '}
-                  <span className="text-slate-300">PHFAMOESCEF THC</span> ({totalOrgs} Feeds)
+                  <span className="text-[#D4AF37] font-semibold">MWPHGLDC</span>{" "}
+                  •{" "}
+                  <span className="text-white font-medium">
+                    Georgiana Thomas Grand Chapter O.E.S.
+                  </span>{" "}
+                  • <span className="text-slate-300">PHFAMOESCEF THC</span> (
+                  {totalOrgs} Feeds)
                 </p>
               </div>
             </div>
@@ -124,7 +134,9 @@ export function Header({
                 <Layers className="w-3.5 h-3.5 text-[#D4AF37]" />
                 <span>{totalEvents} Events</span>
                 {formattedSyncTime && (
-                  <span className="text-slate-300">• Updated {formattedSyncTime}</span>
+                  <span className="text-slate-300">
+                    • Updated {formattedSyncTime}
+                  </span>
                 )}
               </div>
 
