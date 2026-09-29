@@ -6,11 +6,13 @@ import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import listPlugin from '@fullcalendar/list';
 import interactionPlugin from '@fullcalendar/interaction';
+import { EventClickArg } from '@fullcalendar/core';
 import { UnifiedCalendarEvent, OrgCalendarConfig } from '@/config/calendars';
+import { OrgLogo } from './FraternalEmblems';
 
 interface CalendarViewProps {
   events: UnifiedCalendarEvent[];
-  sources: OrgCalendarConfig[];
+  sources?: OrgCalendarConfig[];
   selectedOrgIds: Set<string>;
   searchQuery: string;
   onEventClick: (event: UnifiedCalendarEvent) => void;
@@ -18,12 +20,11 @@ interface CalendarViewProps {
 
 export function CalendarView({
   events,
-  sources,
   selectedOrgIds,
   searchQuery,
   onEventClick,
 }: CalendarViewProps) {
-  const calendarRef = useRef<any>(null);
+  const calendarRef = useRef<FullCalendar | null>(null);
   const [isMobile, setIsMobile] = useState(false);
 
   // Detect mobile screen width (< 768px) and switch to list view automatically
@@ -72,14 +73,14 @@ export function CalendarView({
     end: ev.end,
     allDay: ev.allDay,
     backgroundColor: ev.backgroundColor,
-    borderColor: ev.borderColor,
+    borderColor: ev.backgroundColor,
     textColor: ev.textColor,
     extendedProps: {
       rawEvent: ev,
     },
   }));
 
-  const handleEventClick = (arg: any) => {
+  const handleEventClick = (arg: EventClickArg) => {
     arg.jsEvent.preventDefault();
     const rawEvent = arg.event.extendedProps?.rawEvent as UnifiedCalendarEvent | undefined;
     if (rawEvent) {
@@ -88,7 +89,7 @@ export function CalendarView({
   };
 
   return (
-    <div className="w-full bg-white dark:bg-zinc-900 rounded-2xl shadow-sm border border-zinc-200 dark:border-zinc-800 p-3 sm:p-5 transition-colors overflow-hidden">
+    <div className="w-full bg-white dark:bg-[#0B2545] rounded-xl shadow-card border border-slate-200 dark:border-slate-800 border-t-4 border-t-[#003366] dark:border-t-[#D4AF37] p-3 sm:p-5 transition-all overflow-hidden">
       <FullCalendar
         ref={calendarRef}
         plugins={[dayGridPlugin, timeGridPlugin, listPlugin, interactionPlugin]}
@@ -102,10 +103,20 @@ export function CalendarView({
           today: 'Today',
           month: 'Month',
           week: 'Week',
-          list: 'List',
+          list: 'Schedule List',
         }}
         events={fullCalendarEvents}
         eventClick={handleEventClick}
+        eventDidMount={(info) => {
+          if (info.view.type.startsWith('list')) {
+            const dot = info.el.querySelector('.fc-list-event-dot') as HTMLElement | null;
+            const raw = info.event.extendedProps?.rawEvent as UnifiedCalendarEvent | undefined;
+            const color = raw?.backgroundColor || info.event.backgroundColor;
+            if (dot && color) {
+              dot.style.borderColor = color;
+            }
+          }
+        }}
         navLinks={true}
         editable={false}
         selectable={false}
@@ -130,22 +141,27 @@ export function CalendarView({
         }}
         eventContent={(arg) => {
           const raw = arg.event.extendedProps?.rawEvent as UnifiedCalendarEvent | undefined;
-          const bgColor = raw?.backgroundColor || arg.event.backgroundColor || '#3b82f6';
+          const bgColor = raw?.backgroundColor || arg.event.backgroundColor || '#003366';
           const txtColor = raw?.textColor || arg.event.textColor || '#ffffff';
-          const bdrColor = raw?.borderColor || arg.event.borderColor || bgColor;
+          const bdrColor = raw?.borderColor || arg.event.borderColor || '#D4AF37';
 
           if (arg.view.type.startsWith('list')) {
             return (
-              <div className="flex items-center gap-2 py-0.5 overflow-hidden">
+              <div className="flex items-center gap-2.5 py-0.5 overflow-hidden">
+                {raw && (
+                  <OrgLogo orgId={raw.orgId} size={18} className="w-4.5 h-4.5 flex-shrink-0" />
+                )}
                 <span
-                  className="w-2.5 h-2.5 rounded-full flex-shrink-0"
+                  className="px-2 py-0.5 rounded text-[10px] font-bold tracking-wider text-white uppercase flex-shrink-0"
                   style={{ backgroundColor: bgColor }}
-                />
-                <span className="font-medium text-zinc-900 dark:text-zinc-100 truncate">
+                >
+                  {raw?.orgName.split(' ')[0] || 'EVENT'}
+                </span>
+                <span className="font-semibold text-[#0B2545] dark:text-[#F8F9FA] truncate">
                   {arg.event.title}
                 </span>
                 {raw?.location && (
-                  <span className="text-xs text-zinc-500 dark:text-zinc-400 hidden sm:inline truncate">
+                  <span className="text-xs text-slate-500 dark:text-slate-400 hidden sm:inline truncate">
                     • {raw.location}
                   </span>
                 )}
@@ -155,13 +171,17 @@ export function CalendarView({
 
           return (
             <div
-              className="flex items-center gap-1.5 px-1.5 py-0.5 rounded text-xs font-medium w-full overflow-hidden cursor-pointer shadow-xs hover:brightness-110 transition-all border"
+              className="flex items-center gap-1.5 px-2 py-0.5 rounded-md text-xs font-semibold w-full overflow-hidden cursor-pointer shadow-xs hover:brightness-110 transition-all border"
               style={{
                 backgroundColor: bgColor,
                 color: txtColor,
                 borderColor: bdrColor,
               }}
+              title={`${arg.event.title} (${raw?.orgName || ''})`}
             >
+              {raw && (
+                <OrgLogo orgId={raw.orgId} size={14} className="w-3.5 h-3.5 flex-shrink-0" />
+              )}
               {!arg.event.allDay && (
                 <span className="opacity-90 font-mono text-[10px] flex-shrink-0">
                   {arg.timeText}
