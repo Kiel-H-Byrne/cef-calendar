@@ -70,10 +70,8 @@ export function MasonicEmblem({
  */
 export function EasternStarEmblem({
   className = 'w-7 h-7',
-  size = 100,
 }: {
   className?: string;
-  size?: number;
 }) {
   // 5 points of the star (pointing downward in Prince Hall OES tradition)
   // Center is (50, 50). Outer radius 44, inner radius 18.

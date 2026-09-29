@@ -31,15 +31,15 @@ export function Header({
 
   return (
     <header className="w-full sticky top-0 z-30 shadow-md">
-      {/* Top Announcement & Landmark Bar */}
-      <aside aria-label="Announcement and Location Banner" className="w-full bg-[#061527] border-b border-[#0B2545] text-zinc-300 py-1 px-4 sm:px-6 lg:px-8">
+      {/* Top Announcement & Landmark Bar (Warm, High-Contrast Balance) */}
+      <aside aria-label="Announcement and Location Banner" className="w-full bg-[#FAF8F5] dark:bg-[#061527] border-b border-[#E7E2D7] dark:border-[#0B2545] text-slate-800 dark:text-zinc-300 py-1.5 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-1.5 text-[11px]">
           {/* Heritage & Jurisdiction Note */}
-          <div className="flex items-center gap-2 text-zinc-300">
-            <span className="font-semibold text-[#D4AF37] tracking-wider uppercase">
+          <div className="flex items-center gap-2 text-slate-800 dark:text-zinc-300 font-medium">
+            <span className="font-bold text-[#003366] dark:text-[#D4AF37] tracking-wider uppercase">
               Prince Hall Freemasonry
             </span>
-            <span className="hidden sm:inline text-zinc-500">•</span>
+            <span className="hidden sm:inline text-slate-400">•</span>
             <span className="hidden sm:inline">
               Est. 1825 in the District of Columbia • Historic Black Institutional Stewardship
             </span>
@@ -61,7 +61,7 @@ export function Header({
             <div className="flex items-center gap-3.5">
               {/* Dual Fraternal Emblems: Masonic & Eastern Star */}
               <div
-                className="flex items-center justify-center gap-1.5 p-1.5 rounded-2xl bg-[#003366] border border-[#D4AF37]/60 shadow-[0_0_15px_rgba(212,175,55,0.2)] flex-shrink-0"
+                className="flex items-center justify-center gap-1.5 p-1.5 rounded-2xl bg-[#003366] border border-[#D4AF37]/60 shadow-[0_0_15px_rgba(212,175,55,0.25)] flex-shrink-0"
                 title="MWPHGLDC (Masonic) & GTGC (Eastern Star) United in Leadership"
               >
                 <MasonicEmblem className="w-7 h-7" color="#D4AF37" strokeWidth={2} />
@@ -74,15 +74,15 @@ export function Header({
                   <h1 className="text-lg sm:text-xl font-bold tracking-tight text-white font-heading">
                     Prince Hall Masonic Temple &amp; Jurisdictional Calendar
                   </h1>
-                  <span className="hidden lg:inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-950/80 text-emerald-300 border border-emerald-500/30">
+                  <span className="hidden lg:inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-950/80 text-emerald-300 border border-emerald-500/40">
                     <ShieldCheck className="w-3 h-3 text-[#10B981]" />
                     Live Sync
                   </span>
                 </div>
-                <p className="text-xs text-zinc-300 tracking-wide mt-0.5">
+                <p className="text-xs text-slate-300 tracking-wide mt-0.5">
                   <span className="text-[#D4AF37] font-semibold">MWPHGLDC</span> •{' '}
-                  <span className="text-zinc-200">Georgiana Thomas Grand Chapter O.E.S.</span> •{' '}
-                  <span className="text-zinc-300">PHFAMOESCEF THC</span> ({totalOrgs} Feeds)
+                  <span className="text-white font-medium">Georgiana Thomas Grand Chapter O.E.S.</span> •{' '}
+                  <span className="text-slate-300">PHFAMOESCEF THC</span> ({totalOrgs} Jurisdictional Feeds)
                 </p>
               </div>
             </div>
@@ -90,18 +90,18 @@ export function Header({
             {/* Right Controls: Event Count & Gold Action Button */}
             <div className="flex items-center gap-3 self-end md:self-center text-xs">
               {/* Status Sync Badge */}
-              <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[#003366]/80 text-zinc-200 font-mono text-[11px] border border-[#D4AF37]/30">
+              <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[#003366] text-white font-mono text-[11px] border border-[#D4AF37]/40 shadow-xs">
                 <Layers className="w-3.5 h-3.5 text-[#D4AF37]" />
                 <span>{totalEvents} Events</span>
                 {formattedSyncTime && (
-                  <span className="text-zinc-400">• Updated {formattedSyncTime}</span>
+                  <span className="text-slate-300">• Updated {formattedSyncTime}</span>
                 )}
               </div>
 
               {/* Primary Action Button (Gold CTA) */}
               <button
                 onClick={onOpenSubscribe}
-                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold bg-[#D4AF37] hover:bg-[#B8952E] text-[#0B2545] transition-all duration-150 transform hover:scale-[1.02] active:scale-100 shadow-[0_0_15px_rgba(212,175,55,0.3)] focus:ring-2 focus:ring-[#D4AF37] focus:outline-none motion-reduce:transition-none motion-reduce:transform-none"
+                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold bg-[#D4AF37] hover:bg-[#B8952E] text-[#0B2545] transition-all duration-150 transform hover:scale-[1.02] active:scale-100 shadow-[0_0_15px_rgba(212,175,55,0.35)] focus:ring-2 focus:ring-[#D4AF37] focus:outline-none motion-reduce:transition-none motion-reduce:transform-none"
                 aria-label="Subscribe to calendar feeds"
               >
                 <Rss className="w-3.5 h-3.5 text-[#0B2545]" />

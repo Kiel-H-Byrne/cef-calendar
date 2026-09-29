@@ -11,7 +11,6 @@ import {
   X,
   Share2,
   Check,
-  Building2,
 } from 'lucide-react';
 import { UnifiedCalendarEvent } from '@/config/calendars';
 import { generateSingleEventIcs, getGoogleCalendarUrl } from '@/lib/icsGenerator';

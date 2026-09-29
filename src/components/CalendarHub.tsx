@@ -14,7 +14,7 @@ import {
   LocationBadge,
   FiveColorOesStrip,
 } from './FraternalEmblems';
-import { ShieldCheck, MapPin, Calendar, CheckCircle2 } from 'lucide-react';
+import { Calendar, CheckCircle2 } from 'lucide-react';
 
 interface CalendarHubProps {
   initialData: EventsApiResponse;

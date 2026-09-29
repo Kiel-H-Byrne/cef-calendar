@@ -26,14 +26,8 @@ interface SubscribeModalProps {
 }
 
 export function SubscribeModal({ sources, isOpen, onClose }: SubscribeModalProps) {
-  const [origin, setOrigin] = useState('');
+  const origin = typeof window !== 'undefined' ? window.location.origin : '';
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      setOrigin(window.location.origin);
-    }
-  }, []);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {

@@ -6,12 +6,14 @@ import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import listPlugin from '@fullcalendar/list';
 import interactionPlugin from '@fullcalendar/interaction';
+import { EventClickArg } from '@fullcalendar/core';
 import { UnifiedCalendarEvent, OrgCalendarConfig } from '@/config/calendars';
 import { EasternStarEmblem, MasonicEmblem } from './FraternalEmblems';
+import { Building2 } from 'lucide-react';
 
 interface CalendarViewProps {
   events: UnifiedCalendarEvent[];
-  sources: OrgCalendarConfig[];
+  sources?: OrgCalendarConfig[];
   selectedOrgIds: Set<string>;
   searchQuery: string;
   onEventClick: (event: UnifiedCalendarEvent) => void;
@@ -19,12 +21,11 @@ interface CalendarViewProps {
 
 export function CalendarView({
   events,
-  sources,
   selectedOrgIds,
   searchQuery,
   onEventClick,
 }: CalendarViewProps) {
-  const calendarRef = useRef<any>(null);
+  const calendarRef = useRef<FullCalendar | null>(null);
   const [isMobile, setIsMobile] = useState(false);
 
   // Detect mobile screen width (< 768px) and switch to list view automatically
@@ -80,7 +81,7 @@ export function CalendarView({
     },
   }));
 
-  const handleEventClick = (arg: any) => {
+  const handleEventClick = (arg: EventClickArg) => {
     arg.jsEvent.preventDefault();
     const rawEvent = arg.event.extendedProps?.rawEvent as UnifiedCalendarEvent | undefined;
     if (rawEvent) {
@@ -135,16 +136,20 @@ export function CalendarView({
           const txtColor = raw?.textColor || arg.event.textColor || '#ffffff';
           const bdrColor = raw?.borderColor || arg.event.borderColor || '#D4AF37';
           const isOes = raw?.orgId === 'org-delta';
+          const isMasonic = raw?.orgId === 'org-alpha' || raw?.orgId === 'org-epsilon';
+          const isTemple = raw?.orgId === 'org-gamma' || raw?.orgId === 'org-zeta';
 
           if (arg.view.type.startsWith('list')) {
             return (
               <div className="flex items-center gap-2.5 py-0.5 overflow-hidden">
                 <span
-                  className="w-3 h-3 rounded-full flex-shrink-0 border border-black/10"
+                  className="px-2 py-0.5 rounded text-[10px] font-bold tracking-wider text-white uppercase flex-shrink-0"
                   style={{ backgroundColor: bgColor }}
-                />
+                >
+                  {raw?.orgName.split(' ')[0] || 'EVENT'}
+                </span>
                 {isOes && (
-                  <EasternStarEmblem className="w-3.5 h-3.5 flex-shrink-0" />
+                  <EasternStarEmblem className="w-4 h-4 flex-shrink-0" />
                 )}
                 <span className="font-semibold text-[#0B2545] dark:text-[#F8F9FA] truncate">
                   {arg.event.title}
@@ -170,9 +175,11 @@ export function CalendarView({
             >
               {isOes ? (
                 <EasternStarEmblem className="w-3 h-3 flex-shrink-0" />
-              ) : (
-                <MasonicEmblem className="w-3 h-3 flex-shrink-0" color="#D4AF37" strokeWidth={3} />
-              )}
+              ) : isMasonic ? (
+                <MasonicEmblem className="w-3 h-3 flex-shrink-0" color="#D4AF37" strokeWidth={2.5} />
+              ) : isTemple ? (
+                <Building2 className="w-2.5 h-2.5 flex-shrink-0 opacity-80" />
+              ) : null}
               {!arg.event.allDay && (
                 <span className="opacity-90 font-mono text-[10px] flex-shrink-0">
                   {arg.timeText}
