@@ -82,7 +82,7 @@ export function Header({
                 {/* 2. THC Logo */}
                 <Image
                   src="/cef_thc_logo.png"
-                  alt="CEF THC - Title Holding Corporation"
+                  alt="CEF THC - Title Holding Company"
                   width={36}
                   height={36}
                   className="w-7.5 h-7.5 sm:w-8.5 sm:h-8.5 rounded-full object-contain bg-white p-0.5 border border-[#D4AF37]/40"

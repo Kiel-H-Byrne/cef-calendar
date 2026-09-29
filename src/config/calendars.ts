@@ -34,7 +34,7 @@ export const CALENDAR_SOURCES: OrgCalendarConfig[] = [
   },
   {
     id: "org-gamma",
-    name: "CEF THC - Title Holding",
+    name: "CEF THC - Title Holding Company",
     shortName: "thc",
     sourceType: "outlook",
     icsUrl:

@@ -10,7 +10,7 @@ export interface OrgLogoInfo {
  * - mwphgldc_logo.png: Most Worshipful Prince Hall Grand Lodge of DC
  * - gtgc_logo.jpg: Georgiana Thomas Grand Chapter O.E.S.
  * - cef_logo.jpeg: PHFAMOESCEF
- * - cef_thc_logo.png: CEF THC (Title Holding Corporation)
+ * - cef_thc_logo.png: CEF THC (Title Holding Company)
  */
 export const ORG_LOGOS: Record<string, OrgLogoInfo> = {
   "org-alpha": {
@@ -20,7 +20,7 @@ export const ORG_LOGOS: Record<string, OrgLogoInfo> = {
   "org-beta": { src: "/cef_logo.jpeg", alt: "PHFAMOESCEF" },
   "org-gamma": {
     src: "/cef_thc_logo.png",
-    alt: "CEF THC - Title Holding Corporation",
+    alt: "CEF THC - Title Holding Company",
   },
   "org-delta": {
     src: "/gtgc_logo.jpg",
