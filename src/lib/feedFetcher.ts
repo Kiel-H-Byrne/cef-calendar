@@ -90,9 +90,11 @@ export async function fetchCalendarFeed(
       if (!rawIcsText || !rawIcsText.includes('BEGIN:VCALENDAR')) {
         throw new Error('Received payload is not a valid iCalendar feed');
       }
-    } catch (err: any) {
-      const errorMsg =
-        err?.name === 'AbortError' ? 'Request timed out after 8s' : err?.message || String(err);
+    } catch (err: unknown) {
+      let errorMsg = String(err);
+      if (err instanceof Error) {
+        errorMsg = err.name === 'AbortError' ? 'Request timed out after 8s' : err.message;
+      }
       warnings.push(`Failed to fetch ${source.name} feed from ${url}: ${errorMsg}`);
 
       // Graceful fallback to mock data if available

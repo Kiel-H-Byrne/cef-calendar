@@ -14,11 +14,11 @@ export interface ParseResult {
 /**
  * Safely extracts raw string from node-ical fields which might be string or { val, params }
  */
-export function extractIcsString(val: any): string {
+export function extractIcsString(val: unknown): string {
   if (val === null || val === undefined) return '';
   if (typeof val === 'string') return val;
   if (typeof val === 'object' && 'val' in val) {
-    return String(val.val || '');
+    return String((val as { val?: unknown }).val || '');
   }
   return String(val);
 }
@@ -36,18 +36,16 @@ export function formatDateYMD(d: Date): string {
 /**
  * Pre-indexes EXDATE entries into a fast O(1) Set lookup
  */
-function buildExdateIndex(exdate: any): Set<string> {
+function buildExdateIndex(exdate?: Record<string, unknown> | null): Set<string> {
   const index = new Set<string>();
-  if (!exdate) return index;
+  if (!exdate || typeof exdate !== 'object') return index;
 
-  if (typeof exdate === 'object') {
-    for (const key of Object.keys(exdate)) {
-      index.add(key);
-      const val = exdate[key];
-      if (val instanceof Date) {
-        index.add(formatDateYMD(val));
-        index.add(val.toISOString());
-      }
+  for (const key of Object.keys(exdate)) {
+    index.add(key);
+    const val = exdate[key];
+    if (val instanceof Date) {
+      index.add(formatDateYMD(val));
+      index.add(val.toISOString());
     }
   }
   return index;
@@ -56,16 +54,20 @@ function buildExdateIndex(exdate: any): Set<string> {
 /**
  * Pre-indexes RECURRENCE-ID override entries into a fast O(1) Map lookup
  */
-function buildRecurrencesIndex(recurrences: any): Map<string, any> {
-  const index = new Map<string, any>();
+function buildRecurrencesIndex(
+  recurrences?: Record<string, unknown> | null
+): Map<string, ical.VEvent> {
+  const index = new Map<string, ical.VEvent>();
   if (!recurrences || typeof recurrences !== 'object') return index;
 
   for (const key of Object.keys(recurrences)) {
-    const item = recurrences[key];
-    index.set(key, item);
-    if (item && item.start instanceof Date) {
-      index.set(formatDateYMD(item.start), item);
-      index.set(item.start.toISOString(), item);
+    const item = recurrences[key] as ical.VEvent | undefined;
+    if (item) {
+      index.set(key, item);
+      if (item.start instanceof Date) {
+        index.set(formatDateYMD(item.start), item);
+        index.set(item.start.toISOString(), item);
+      }
     }
   }
   return index;
@@ -74,7 +76,7 @@ function buildRecurrencesIndex(recurrences: any): Map<string, any> {
 /**
  * Unescapes RFC 5545 text strings
  */
-export function unescapeIcsText(input: any): string {
+export function unescapeIcsText(input: unknown): string {
   const text = extractIcsString(input);
   if (!text) return '';
   return text
@@ -107,9 +109,10 @@ export function parseIcsContent(
   let parsed: ical.CalendarResponse;
   try {
     parsed = ical.parseICS(icsData);
-  } catch (err: any) {
+  } catch (err: unknown) {
+    const errorMsg = err instanceof Error ? err.message : String(err);
     warnings.push(
-      `Failed to parse iCal feed for ${source.name} (${source.id}): ${err?.message || String(err)}`
+      `Failed to parse iCal feed for ${source.name} (${source.id}): ${errorMsg}`
     );
     return { events, warnings };
   }
@@ -122,8 +125,8 @@ export function parseIcsContent(
 
     // Check if event is all-day
     const isAllDay =
-      (vEvent.start as any)?.dateOnly === true ||
-      (vEvent as any).datetype === 'date';
+      vEvent.start?.dateOnly === true ||
+      vEvent.datetype === 'date';
 
     const title = unescapeIcsText(vEvent.summary) || '(Untitled Event)';
     const description = unescapeIcsText(vEvent.description) || undefined;
@@ -144,8 +147,10 @@ export function parseIcsContent(
             : 60 * 60 * 1000;
 
         // Pre-index exdate and recurrences for fast O(1) queries
-        const exdateIndex = buildExdateIndex(vEvent.exdate);
-        const recurrencesIndex = buildRecurrencesIndex(vEvent.recurrences);
+        const exdateIndex = buildExdateIndex(vEvent.exdate as Record<string, unknown> | undefined);
+        const recurrencesIndex = buildRecurrencesIndex(
+          vEvent.recurrences as Record<string, unknown> | undefined
+        );
         const handledOverrideKeys = new Set<string>();
 
         // Generate occurrences within bounded rolling window
@@ -161,7 +166,9 @@ export function parseIcsContent(
           }
 
           // O(1) recurrence override check
-          const override = recurrencesIndex.get(dateYMD) || recurrencesIndex.get(dateISO);
+          const override = (recurrencesIndex.get(dateYMD) || recurrencesIndex.get(dateISO)) as
+            | ical.VEvent
+            | undefined;
 
           if (override && override.type === 'VEVENT') {
             const overStart: Date =
@@ -172,7 +179,7 @@ export function parseIcsContent(
                 : new Date(overStart.getTime() + baseDurationMs);
 
             const overIsAllDay =
-              (overStart as any)?.dateOnly === true ||
+              (override.start && 'dateOnly' in override.start && override.start.dateOnly === true) ||
               override.datetype === 'date';
 
             const startStr = overIsAllDay
@@ -230,7 +237,7 @@ export function parseIcsContent(
         // Also check if any overrides in recurrences exist that weren't captured by between()
         if (vEvent.recurrences) {
           for (const [rKey, recItem] of Object.entries(vEvent.recurrences)) {
-            const vRecItem = recItem as any;
+            const vRecItem = recItem as ical.VEvent;
             if (
               !handledOverrideKeys.has(rKey) &&
               vRecItem &&
@@ -245,7 +252,7 @@ export function parseIcsContent(
                     : new Date(recStart.getTime() + baseDurationMs);
 
                 const recAllDay =
-                  (recStart as any)?.dateOnly === true ||
+                  (vRecItem.start && 'dateOnly' in vRecItem.start && vRecItem.start.dateOnly === true) ||
                   vRecItem.datetype === 'date';
 
                 events.push({
@@ -271,9 +278,10 @@ export function parseIcsContent(
             }
           }
         }
-      } catch (rErr: any) {
+      } catch (rErr: unknown) {
+        const errorMsg = rErr instanceof Error ? rErr.message : String(rErr);
         warnings.push(
-          `Error expanding recurrence for event "${title}" in ${source.name}: ${rErr?.message || String(rErr)}`
+          `Error expanding recurrence for event "${title}" in ${source.name}: ${errorMsg}`
         );
       }
     } else {
