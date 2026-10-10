@@ -41,11 +41,12 @@ async function handleRevalidate(request: NextRequest) {
       now: new Date().toISOString(),
       message: `Successfully purged cache for tag: ${tag} and refreshed route paths.`,
     });
-  } catch (err: any) {
+  } catch (err: unknown) {
+    const errorMsg = err instanceof Error ? err.message : String(err);
     return NextResponse.json(
       {
         revalidated: false,
-        error: err?.message || String(err),
+        error: errorMsg,
       },
       { status: 500 },
     );

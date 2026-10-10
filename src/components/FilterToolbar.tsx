@@ -227,19 +227,19 @@ export function FilterToolbar({
 
                       <a
                         href={masterHttp}
-                        download="prince-hall-jurisdictional-calendar.ics"
+                        download="master.ics"
                         onClick={() => setDropdownOpen(false)}
                         className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-[#003366] transition-colors"
                       >
                         <Download className="w-4 h-4 text-slate-400" />
                         <div>
                           <div className="font-semibold text-[#0B2545] dark:text-white">Download Calendar File (.ics)</div>
-                          <div className="text-[10px] text-slate-400">Offline calendar backup</div>
+                          <div className="text-[10px] text-slate-400">Offline calendar backup (master.ics)</div>
                         </div>
                       </a>
 
                       <button
-                        onClick={() => handleCopyLink(masterWebcal, 'quick-copy')}
+                        onClick={() => handleCopyLink(masterHttp, 'quick-copy')}
                         className="w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-[#003366] transition-colors text-left"
                       >
                         <div className="flex items-center gap-2.5">

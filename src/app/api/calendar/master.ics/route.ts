@@ -28,15 +28,13 @@ export async function GET(request: NextRequest) {
 
     const calName = targetOrg
       ? `${targetOrg.name} Events`
-      : 'Unified Community Calendar';
+      : 'Prince Hall Masonic Temple & Jurisdictional Calendar';
 
     const calDesc = targetOrg
       ? `Calendar feed for ${targetOrg.name}`
-      : `Aggregated community calendar from ${data.sources.length} organizations`;
+      : 'Unified Jurisdictional Schedule for MWPHGLDC, GTGC, PHFAMOESCEF, and THC';
 
-    const filename = targetOrg
-      ? `${targetOrg.id}-events.ics`
-      : 'combined-community-calendar.ics';
+    const filename = 'master.ics';
 
     // Fast ETag computation
     const etagSource = `${orgId || 'all'}-${data.events.length}-${data.lastUpdated}`;
@@ -59,20 +57,21 @@ export async function GET(request: NextRequest) {
       headers: {
         ETag: etag,
         'Content-Type': 'text/calendar; charset=utf-8',
-        'Content-Disposition': `inline; filename="${filename}"`,
+        'Content-Disposition': `attachment; filename="${filename}"`,
         'Cache-Control': forceRefresh
           ? 'no-store, no-cache, must-revalidate'
           : 'public, s-maxage=900, stale-while-revalidate=1800',
       },
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error generating master ICS feed:', error);
     return new NextResponse(
-      `BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//Community Calendar//EN\r\nEND:VCALENDAR\r\n`,
+      `BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//PHFAMOESCEF//Jurisdictional Calendar//EN\r\nEND:VCALENDAR\r\n`,
       {
         status: 500,
         headers: {
           'Content-Type': 'text/calendar; charset=utf-8',
+          'Content-Disposition': 'attachment; filename="master.ics"',
         },
       }
     );

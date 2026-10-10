@@ -67,13 +67,14 @@ export async function GET(request: Request) {
       status: 200,
       headers: responseHeaders,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const errorMsg = error instanceof Error ? error.message : String(error);
     console.error('API /api/events error:', error);
     return NextResponse.json(
       {
         events: [],
         sources: [],
-        warnings: [`Server-side ingestion error: ${error?.message || String(error)}`],
+        warnings: [`Server-side ingestion error: ${errorMsg}`],
         lastUpdated: new Date().toISOString(),
       },
       { status: 500 }
