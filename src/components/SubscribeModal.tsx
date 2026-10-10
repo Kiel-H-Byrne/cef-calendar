@@ -44,7 +44,8 @@ export function SubscribeModal({ sources, isOpen, onClose }: SubscribeModalProps
   const hostWithProto = origin || 'https://www.phfamoescef.com';
   const masterHttpUrl = `${hostWithProto}/api/calendar/master.ics`;
   const masterWebcalUrl = masterHttpUrl.replace(/^https?:\/\//i, 'webcal://');
-  const googleSubscribeUrl = `https://calendar.google.com/calendar/r?cid=${encodeURIComponent(masterHttpUrl)}`;
+  // Google's subscribe-by-URL flow expects a webcal:// scheme in `cid`; an https:// value fails with "can't load calendar"
+  const googleSubscribeUrl = `https://calendar.google.com/calendar/r?cid=${encodeURIComponent(masterWebcalUrl)}`;
 
   const handleCopy = async (text: string, key: string) => {
     try {
@@ -211,7 +212,7 @@ export function SubscribeModal({ sources, isOpen, onClose }: SubscribeModalProps
                 // Pass-through links direct to the live upstream .ics URL
                 const orgIcsUrl = src.icsUrl;
                 const orgWebcal = src.icsUrl.replace(/^https?:\/\//i, 'webcal://');
-                const orgGoogleUrl = `https://calendar.google.com/calendar/r?cid=${encodeURIComponent(src.icsUrl)}`;
+                const orgGoogleUrl = `https://calendar.google.com/calendar/r?cid=${encodeURIComponent(orgWebcal)}`;
 
                 return (
                   <div
