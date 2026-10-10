@@ -5,20 +5,20 @@ import {
   OrgCalendarConfig,
   UnifiedCalendarEvent,
 } from "@/config/calendars";
-import { Calendar, Globe } from "lucide-react";
+import { Calendar } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
+import { SITE } from "@/config/site";
 import { CalendarView } from "./CalendarView";
 import { EventModal } from "./EventModal";
 import { FilterToolbar } from "./FilterToolbar";
-import {
-  FiveColorOesStrip,
-  LocationBadge,
-  TaxExemptBadge,
-  WebsiteLinkBadge,
-} from "./FraternalEmblems";
+import { FiveColorOesStrip } from "./FraternalEmblems";
 import { Header } from "./Header";
 import { SubscribeModal } from "./SubscribeModal";
+
+// Footer links to each organization's own site (underlined so they read as links)
+const ORG_LINK_CLASS =
+  "font-bold text-white underline decoration-[#D4AF37]/50 underline-offset-2 hover:text-[#D4AF37] hover:decoration-[#D4AF37] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37] rounded-sm";
 
 interface CalendarHubProps {
   initialData: EventsApiResponse;
@@ -121,7 +121,6 @@ export function CalendarHub({ initialData }: CalendarHubProps) {
         totalEvents={events.length}
         totalOrgs={sources.length}
         lastUpdated={lastUpdated}
-        onOpenSubscribe={() => setIsSubscribeOpen(true)}
       />
 
       {/* Main Container */}
@@ -153,7 +152,7 @@ export function CalendarHub({ initialData }: CalendarHubProps) {
       </main>
 
       {/* Dignified Fraternal Institutional Footer */}
-      <footer className="w-full bg-[#0B2545] border-t-2 border-[#D4AF37] text-white mt-12">
+      <footer className="w-full bg-[#0B2545] border-t-2 border-[#D4AF37] text-white mt-12 pb-[env(safe-area-inset-bottom)]">
         <FiveColorOesStrip className="h-1 w-full" />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 pb-8 border-b border-slate-700/80">
@@ -206,11 +205,6 @@ export function CalendarHub({ initialData }: CalendarHubProps) {
                 in the District of Columbia and multi-generational institutional
                 stewardship.
               </p>
-              <div className="flex flex-wrap gap-2 pt-1">
-                <TaxExemptBadge />
-                <LocationBadge />
-                <WebsiteLinkBadge />
-              </div>
             </div>
 
             {/* Column 2: Fraternal Governance & Entities in Order (CEF, THC, MWPHGLDC, GTGC) */}
@@ -228,8 +222,15 @@ export function CalendarHub({ initialData }: CalendarHubProps) {
                     className="w-4.5 h-4.5 rounded-full bg-white object-contain"
                   />
                   <span>
-                    <strong className="text-white">PHFAMOESCEF:</strong>{" "}
-                    Charitable &amp; Educational Foundation (501c3)
+                    <a
+                      href="https://www.phfamoescef.com"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={ORG_LINK_CLASS}
+                    >
+                      PHFAMOESCEF
+                    </a>
+                    : Charitable &amp; Educational Foundation (501c3)
                   </span>
                 </li>
                 <li className="flex items-center gap-2">
@@ -241,8 +242,15 @@ export function CalendarHub({ initialData }: CalendarHubProps) {
                     className="w-4.5 h-4.5 rounded-full bg-white object-contain"
                   />
                   <span>
-                    <strong className="text-white">CEF THC:</strong> Title
-                    Holding Corporation (1000 U St NW)
+                    <a
+                      href="https://cef-thc.netlify.app/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={ORG_LINK_CLASS}
+                    >
+                      CEF THC
+                    </a>
+                    : Title Holding Company (1000 U St NW)
                   </span>
                 </li>
                 <li className="flex items-center gap-2">
@@ -254,8 +262,16 @@ export function CalendarHub({ initialData }: CalendarHubProps) {
                     className="w-4.5 h-4.5 rounded-full bg-white object-contain"
                   />
                   <span>
-                    <strong className="text-white">MWPHGLDC:</strong> Most
-                    Worshipful Prince Hall Grand Lodge of D.C. (Est. 1825)
+                    <a
+                      href="https://www.mwphgldc.com"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={ORG_LINK_CLASS}
+                    >
+                      MWPHGLDC
+                    </a>
+                    : Most Worshipful Prince Hall Grand Lodge of D.C. (Est.
+                    1825)
                   </span>
                 </li>
                 <li className="flex items-center gap-2">
@@ -267,8 +283,16 @@ export function CalendarHub({ initialData }: CalendarHubProps) {
                     className="w-4.5 h-4.5 rounded-full bg-white object-contain"
                   />
                   <span>
-                    <strong className="text-white">GTGC:</strong> Georgiana
-                    Thomas Grand Chapter, Order of the Eastern Star, PHA
+                    <a
+                      href="https://www.facebook.com/gtgcdc/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={ORG_LINK_CLASS}
+                    >
+                      GTGC
+                    </a>
+                    : Georgiana Thomas Grand Chapter, Order of the Eastern
+                    Star, PHA
                   </span>
                 </li>
               </ul>
@@ -299,26 +323,33 @@ export function CalendarHub({ initialData }: CalendarHubProps) {
 
           {/* Bottom Copyright, Website Link, & Heritage Line */}
           <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-400">
-            <div className="flex items-center gap-2 flex-wrap justify-center sm:justify-start">
-              <span>
-                © {new Date().getFullYear()} Prince Hall Masonic Temple &amp;
-                The MWPHGLDC / GTGC Jurisdiction.
-              </span>
-              <span>•</span>
-              <a
-                href="https://www.phfamoescef.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-[#D4AF37] hover:underline inline-flex items-center gap-1 font-semibold"
-              >
-                <Globe className="w-3 h-3 inline" />
-                phfamoescef.com
-              </a>
+            <div className="flex items-center gap-2 justify-center sm:justify-start">
+              <Image
+                src="/icons/icon-192.png"
+                alt=""
+                width={20}
+                height={20}
+                className="w-5 h-5 rounded-md"
+              />
+              <span className="font-semibold text-slate-300">{SITE.name}</span>
             </div>
             <div className="text-[11px] text-[#D4AF37]/90 font-medium">
               Heritage • Dignity • Fraternal Unity • Community Impact
             </div>
           </div>
+
+          {/* Studio attribution */}
+          <p className="pt-4 text-center text-[11px] text-slate-400">
+            Designed &amp; built by{" "}
+            <a
+              href={SITE.builder.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-semibold text-slate-300 hover:text-[#D4AF37] hover:underline"
+            >
+              {SITE.builder.name}
+            </a>
+          </p>
         </div>
       </footer>
 

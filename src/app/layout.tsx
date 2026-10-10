@@ -1,5 +1,7 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { Plus_Jakarta_Sans, Inter, JetBrains_Mono } from 'next/font/google';
+import { JsonLd } from '@/components/JsonLd';
+import { SITE } from '@/config/site';
 import './globals.css';
 
 const plusJakartaSans = Plus_Jakarta_Sans({
@@ -24,21 +26,45 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://www.phfamoescef.com'),
-  title: 'MWPHGLDC & GTGC | Prince Hall Masonic Temple (PHFAMOESCEF) Jurisdictional Calendar',
-  description:
-    'Official unified jurisdictional calendar for the Most Worshipful Prince Hall Grand Lodge of DC, Georgiana Thomas Grand Chapter O.E.S., and the Prince Hall Masonic Temple / PHFAMOESCEF at 1000 U Street NW, Washington, D.C. Visit phfamoescef.com for more information.',
-  keywords: [
-    'Prince Hall',
-    'MWPHGLDC',
-    'Georgiana Thomas Grand Chapter',
-    'OES',
-    'PHFAMOESCEF',
-    'phfamoescef.com',
-    '1000 U Street NW',
-    'Masonic Temple Washington DC',
-    'Masonic Calendar',
-  ],
+  metadataBase: new URL(SITE.url),
+  title: { default: SITE.title, template: `%s | ${SITE.name}` },
+  description: SITE.description,
+  applicationName: SITE.name,
+  keywords: [...SITE.keywords],
+  authors: [{ name: SITE.builder.name, url: SITE.builder.url }],
+  creator: SITE.builder.name,
+  alternates: { canonical: '/' },
+  openGraph: {
+    type: 'website',
+    url: '/',
+    siteName: SITE.name,
+    title: SITE.title,
+    description: SITE.description,
+    locale: SITE.locale,
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: SITE.title,
+    description: SITE.description,
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: { index: true, follow: true, 'max-image-preview': 'large', 'max-snippet': -1 },
+  },
+  // Stop iOS from turning times, years and the street address into default-blue links
+  formatDetection: { telephone: false, address: false, email: false },
+  // "Add to Home Screen": own title, standalone window, navy status bar that blends with the header
+  appleWebApp: { capable: true, title: SITE.shortName, statusBarStyle: 'black-translucent' },
+  other: { 'apple-mobile-web-app-capable': 'yes' },
+};
+
+export const viewport: Viewport = {
+  themeColor: SITE.colors.navy,
+  width: 'device-width',
+  initialScale: 1,
+  // Lets the navy header extend under the iOS status bar / notch (insets are padded in the layout)
+  viewportFit: 'cover',
 };
 
 export default function RootLayout({
@@ -52,6 +78,7 @@ export default function RootLayout({
       className={`${plusJakartaSans.variable} ${inter.variable} ${jetbrainsMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-[#F8F9FA] dark:bg-[#07192F] text-[#1A1D20] dark:text-[#F8F9FA] font-body selection:bg-[#D4AF37] selection:text-[#0B2545]">
+        <JsonLd />
         {children}
       </body>
     </html>

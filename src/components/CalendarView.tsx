@@ -18,6 +18,20 @@ interface CalendarViewProps {
   onEventClick: (event: UnifiedCalendarEvent) => void;
 }
 
+// Visible hours for the Week and Day time grids
+const SLOT_MIN_HOUR = 6;
+const SLOT_MAX_HOUR = 23;
+const TIME_GRID_HOURS = {
+  slotMinTime: `${String(SLOT_MIN_HOUR).padStart(2, '0')}:00:00`,
+  slotMaxTime: `${String(SLOT_MAX_HOUR).padStart(2, '0')}:00:00`,
+};
+
+// One hour before the current time, kept within the visible slot range
+function getDayScrollTime(): string {
+  const hour = Math.min(Math.max(new Date().getHours() - 1, SLOT_MIN_HOUR), SLOT_MAX_HOUR - 1);
+  return `${String(hour).padStart(2, '0')}:00:00`;
+}
+
 export function CalendarView({
   events,
   selectedOrgIds,
@@ -25,25 +39,60 @@ export function CalendarView({
   onEventClick,
 }: CalendarViewProps) {
   const calendarRef = useRef<FullCalendar | null>(null);
+  const wasMobileRef = useRef<boolean | null>(null);
   const [isMobile, setIsMobile] = useState(false);
+  const [viewType, setViewType] = useState('dayGridMonth');
 
-  // Detect mobile screen width (< 768px) and switch to list view automatically
+  // Detect mobile screen width (< 768px). Phones land on today's Day view; this only
+  // happens on load or when crossing the breakpoint, so a view picked by hand isn't
+  // undone by resize events (e.g. mobile browser toolbars collapsing while scrolling).
   useEffect(() => {
     const checkMobile = () => {
       const mobile = window.innerWidth < 768;
       setIsMobile(mobile);
-      if (mobile && calendarRef.current) {
+      if (mobile && wasMobileRef.current !== true && calendarRef.current) {
         const calendarApi = calendarRef.current.getApi();
-        if (calendarApi && (calendarApi.view.type === 'dayGridMonth' || calendarApi.view.type === 'timeGridWeek')) {
-          calendarApi.changeView('listMonth');
+        if (calendarApi.view.type === 'dayGridMonth' || calendarApi.view.type === 'timeGridWeek') {
+          calendarApi.changeView('timeGridDay');
         }
       }
+      wasMobileRef.current = mobile;
     };
 
     checkMobile();
     window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
+    return () => {
+      window.removeEventListener('resize', checkMobile);
+      // The calendar is re-created when effects re-run (Strict Mode), so re-apply the default view
+      wasMobileRef.current = null;
+    };
   }, []);
+
+  // A home-screen app can stay suspended overnight and resume on yesterday's Day view;
+  // jump back to today when the app comes to the foreground on a new calendar day.
+  useEffect(() => {
+    let lastSeenDay = new Date().toDateString();
+    const handleVisibility = () => {
+      if (document.visibilityState !== 'visible') return;
+      const today = new Date().toDateString();
+      if (today !== lastSeenDay) {
+        lastSeenDay = today;
+        calendarRef.current?.getApi().today();
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibility);
+    return () => document.removeEventListener('visibilitychange', handleVisibility);
+  }, []);
+
+  // Day view gets a fixed height (its own scroller) and opens scrolled to one hour
+  // before now so the current-time bar is on screen. FullCalendar's `height` is a
+  // calendar-level option, so it follows the active view instead of living in `views`.
+  useEffect(() => {
+    if (viewType === 'timeGridDay') {
+      requestAnimationFrame(() => calendarRef.current?.getApi().scrollToTime(getDayScrollTime()));
+    }
+  }, [viewType]);
 
   // Filter events based on selected organizations and search query
   const filteredEvents = events.filter((ev) => {
@@ -97,13 +146,14 @@ export function CalendarView({
         headerToolbar={{
           left: 'prev,next today',
           center: 'title',
-          right: 'dayGridMonth,timeGridWeek,listMonth',
+          right: 'dayGridMonth,timeGridWeek,timeGridDay,listMonth',
         }}
         buttonText={{
           today: 'Today',
           month: 'Month',
           week: 'Week',
-          list: 'Schedule List',
+          day: 'Day',
+          list: 'Schedule',
         }}
         events={fullCalendarEvents}
         eventClick={handleEventClick}
@@ -123,15 +173,17 @@ export function CalendarView({
         dayMaxEvents={3}
         moreLinkClick="popover"
         nowIndicator={true}
-        height="auto"
+        height={viewType === 'timeGridDay' ? '80vh' : 'auto'}
+        datesSet={(arg) => setViewType(arg.view.type)}
         aspectRatio={isMobile ? 0.9 : 1.75}
         views={{
           dayGridMonth: {
             dayMaxEvents: 3,
           },
-          timeGridWeek: {
-            slotMinTime: '06:00:00',
-            slotMaxTime: '23:00:00',
+          timeGridWeek: TIME_GRID_HOURS,
+          timeGridDay: {
+            ...TIME_GRID_HOURS,
+            scrollTime: getDayScrollTime(),
           },
         }}
         eventTimeFormat={{

@@ -191,7 +191,7 @@ export function FilterToolbar({
                   <div className="absolute right-0 mt-2 w-72 bg-white dark:bg-[#0B2545] rounded-xl shadow-xl border border-slate-200 dark:border-slate-700 overflow-hidden z-40 animate-in fade-in zoom-in-95 duration-150">
                     <div className="px-3.5 py-2.5 bg-[#0B2545] border-b border-[#D4AF37]">
                       <div className="text-xs font-bold text-white">
-                        Sync Jurisdictional Calendar
+                        Sync the Unified Calendar
                       </div>
                       <div className="text-[11px] text-[#D4AF37]">
                         Direct calendar sync
@@ -212,7 +212,7 @@ export function FilterToolbar({
                       </a>
 
                       <a
-                        href={`https://calendar.google.com/calendar/r?cid=${encodeURIComponent(masterHttp)}`}
+                        href={`https://calendar.google.com/calendar/r?cid=${encodeURIComponent(masterWebcal)}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         onClick={() => setDropdownOpen(false)}
