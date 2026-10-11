@@ -11,7 +11,7 @@ Aggregates 4 distinct public iCalendar (`.ics`) feeds (3 from Outlook on the web
 - **Server-Side Ingestion & CORS Proxy:** External `.ics` feeds are fetched strictly server-side using native Next.js `fetch` with `next: { revalidate: 900 }` (15-minute ISR cache).
 - **Recurrence & Exception Handling:** Expands complex `RRULE` patterns (daily, weekly, monthly, interval-based) across a configurable rolling window, while respecting `EXDATE` exclusions and `RECURRENCE-ID` instance overrides.
 - **Timezone & All-Day Accuracy:** Formats all-day events using plain date strings (`YYYY-MM-DD`) with RFC 5545 exclusive boundary adjustments to prevent 1-hour daylight saving or multi-timezone displacement. Timed events are normalized to ISO UTC strings and localized client-side to the user's browser.
-- **Fail-Soft Resiliency:** If any remote feed is down, times out, or returns invalid data, the system isolates the failure, serves partial results from operational feeds, logs structured warnings, and falls back to bundled fallback data so the community schedule is never blank.
+- **Fail-Soft Resiliency:** If any remote feed is down, times out, or returns invalid data, the system isolates the failure and keeps serving the other feeds. The failed calendar shows a plain-language notice; if this server holds a genuinely fetched copy less than 6 hours old, that copy is shown and labeled "as of <time>". Otherwise the calendar contributes no events. **Fake data is never shown to end users:** the bundled sample feeds are for local development only (see `ENABLE_MOCK_FALLBACK`) and are ignored in production builds, including Vercel previews.
 - **Interactive Multi-View Calendar:**
   - Month Grid (`dayGridMonth`), Week Grid (`timeGridWeek`), and List (`listMonth`) views.
   - Automatically switches to List view on mobile viewports (`< 768px`) for optimal readability.
@@ -62,7 +62,7 @@ thcCalendar/
 │   │   ├── feedFetcher.ts               # Resilient fetcher with 15m ISR caching
 │   │   └── icsGenerator.ts              # RFC 5545 calendar and event generator
 │   └── mock-data/
-│       └── mockFeeds.ts                 # Bundled fallback RFC 5545 sample feeds
+│       └── mockFeeds.ts                 # TEST DATA ONLY: sample feeds, dev opt-in, never used in production
 ├── .env.example                         # Environment configuration template
 └── README.md
 ```
@@ -97,8 +97,9 @@ CAL_BETA_ICS_URL="https://outlook.office365.com/owa/calendar/.../reachcalendar.i
 CAL_GAMMA_ICS_URL="https://outlook.office365.com/owa/calendar/.../reachcalendar.ics"
 CAL_DELTA_ICS_URL="https://calendar.google.com/calendar/ical/.../public/basic.ics"
 
-# Set to "true" to serve realistic bundled sample feeds if URLs are unconfigured or unreachable
-ENABLE_MOCK_FALLBACK="true"
+# LOCAL DEVELOPMENT ONLY. Set to "true" to show bundled SAMPLE events for feeds that are unconfigured or
+# unreachable. Ignored when NODE_ENV=production (deployed sites never show sample data). Off by default.
+# ENABLE_MOCK_FALLBACK="true"
 ```
 
 ---

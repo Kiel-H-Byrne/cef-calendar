@@ -133,9 +133,26 @@ export interface UnifiedCalendarEvent {
   textColor: string;
 }
 
+/**
+ * Health of one calendar feed, safe to show end users:
+ * - ok:          events are live from the feed
+ * - stale:       the feed couldn't be reached; events are the last real copy we fetched (`asOf`)
+ * - unavailable: the feed couldn't be reached and there is no real copy; no events are shown
+ * - sample:      bundled test data (development only, never produced in production)
+ */
+export type FeedState = "ok" | "stale" | "unavailable" | "sample";
+
+export interface FeedStatus {
+  orgId: string;
+  orgName: string;
+  state: FeedState;
+  /** ISO time of the last successful fetch behind the events shown (stale only) */
+  asOf?: string;
+}
+
 export interface EventsApiResponse {
   events: UnifiedCalendarEvent[];
   sources: OrgCalendarConfig[];
-  warnings: string[];
+  feedStatus: FeedStatus[];
   lastUpdated: string;
 }

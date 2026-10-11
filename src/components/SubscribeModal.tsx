@@ -17,11 +17,13 @@ import { OrgLogo } from './FraternalEmblems';
 
 interface SubscribeModalProps {
   sources: OrgCalendarConfig[];
+  /** Feeds that can't currently be reached; their individual subscribe links are withheld */
+  unavailableOrgIds?: Set<string>;
   isOpen: boolean;
   onClose: () => void;
 }
 
-export function SubscribeModal({ sources, isOpen, onClose }: SubscribeModalProps) {
+export function SubscribeModal({ sources, unavailableOrgIds, isOpen, onClose }: SubscribeModalProps) {
   const origin = typeof window !== 'undefined' ? window.location.origin : '';
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
 
@@ -67,8 +69,8 @@ export function SubscribeModal({ sources, isOpen, onClose }: SubscribeModalProps
       >
         {/* Modal Header with Official Brand Logos (1: CEF, 2: THC, 3: MWPHGLDC, 4: GTGC) */}
         <div className="p-5 sm:p-6 bg-[#0B2545] border-b border-[#D4AF37] flex items-center justify-between text-white">
-          <div className="flex items-center gap-3">
-            <div className="flex items-center gap-1.5 p-1 rounded-xl bg-white/10 border border-[#D4AF37]/50 shadow-[0_0_10px_rgba(212,175,55,0.2)]">
+          <div className="flex flex-col items-start sm:flex-row sm:items-center gap-2.5 sm:gap-3">
+            <div className="flex flex-shrink-0 items-center gap-1.5 p-1 rounded-xl bg-white/10 border border-[#D4AF37]/50 shadow-[0_0_10px_rgba(212,175,55,0.2)]">
               <Image
                 src="/cef_logo.jpeg"
                 alt="PHFAMOESCEF"
@@ -229,6 +231,11 @@ export function SubscribeModal({ sources, isOpen, onClose }: SubscribeModalProps
                       </div>
                     </div>
 
+                    {unavailableOrgIds?.has(src.id) ? (
+                      <span className="self-end sm:self-center px-3 py-1.5 text-xs font-semibold rounded-lg bg-amber-50 dark:bg-amber-950/40 border border-amber-300 dark:border-amber-700/60 text-amber-900 dark:text-amber-200">
+                        Temporarily unavailable
+                      </span>
+                    ) : (
                     <div className="flex items-center gap-1.5 self-end sm:self-center">
                       <a
                         href={orgWebcal}
@@ -259,6 +266,7 @@ export function SubscribeModal({ sources, isOpen, onClose }: SubscribeModalProps
                         )}
                       </button>
                     </div>
+                    )}
                   </div>
                 );
               })}

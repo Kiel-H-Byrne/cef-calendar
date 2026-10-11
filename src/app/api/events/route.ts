@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { fetchAllCalendarFeeds } from '@/lib/feedFetcher';
+import { fetchAllCalendarFeeds, toClientPayload } from '@/lib/feedFetcher';
 
 export const dynamic = 'force-dynamic';
 
@@ -57,26 +57,15 @@ export async function GET(request: Request) {
         : 'public, s-maxage=900, stale-while-revalidate=1800',
     };
 
-    if (data.warnings.length > 0) {
-      responseHeaders['X-Calendar-Warnings'] = encodeURIComponent(
-        data.warnings.join(' | ')
-      );
-    }
-
-    return NextResponse.json(data, {
+    // Diagnostics (upstream URLs, error text) stay in the server logs
+    return NextResponse.json(toClientPayload(data), {
       status: 200,
       headers: responseHeaders,
     });
   } catch (error: unknown) {
-    const errorMsg = error instanceof Error ? error.message : String(error);
     console.error('API /api/events error:', error);
     return NextResponse.json(
-      {
-        events: [],
-        sources: [],
-        warnings: [`Server-side ingestion error: ${errorMsg}`],
-        lastUpdated: new Date().toISOString(),
-      },
+      { error: 'Calendar events are temporarily unavailable.' },
       { status: 500 }
     );
   }

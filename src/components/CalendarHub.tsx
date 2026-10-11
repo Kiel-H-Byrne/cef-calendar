@@ -2,6 +2,7 @@
 
 import {
   EventsApiResponse,
+  FeedStatus,
   OrgCalendarConfig,
   UnifiedCalendarEvent,
 } from "@/config/calendars";
@@ -31,7 +32,9 @@ export function CalendarHub({ initialData }: CalendarHubProps) {
   const [sources, setSources] = useState<OrgCalendarConfig[]>(
     initialData.sources,
   );
-  const [warnings, setWarnings] = useState<string[]>(initialData.warnings);
+  const [feedStatus, setFeedStatus] = useState<FeedStatus[]>(
+    initialData.feedStatus,
+  );
   const [lastUpdated, setLastUpdated] = useState<string>(
     initialData.lastUpdated,
   );
@@ -81,7 +84,7 @@ export function CalendarHub({ initialData }: CalendarHubProps) {
       if (res.ok) {
         const data: EventsApiResponse = await res.json();
         setEvents(data.events);
-        setWarnings(data.warnings);
+        setFeedStatus(data.feedStatus);
         setLastUpdated(data.lastUpdated);
 
         // Reconcile organizations dynamically
@@ -138,7 +141,7 @@ export function CalendarHub({ initialData }: CalendarHubProps) {
           onRefresh={handleRefresh}
           isLoading={isLoading}
           onOpenSubscribeModal={() => setIsSubscribeOpen(true)}
-          warnings={warnings}
+          feedStatus={feedStatus}
         />
 
         {/* Interactive FullCalendar View */}
@@ -362,6 +365,13 @@ export function CalendarHub({ initialData }: CalendarHubProps) {
       {/* Subscription Dialog Modal */}
       <SubscribeModal
         sources={sources}
+        unavailableOrgIds={
+          new Set(
+            feedStatus
+              .filter((feed) => feed.state === "unavailable")
+              .map((feed) => feed.orgId),
+          )
+        }
         isOpen={isSubscribeOpen}
         onClose={() => setIsSubscribeOpen(false)}
       />

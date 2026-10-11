@@ -1,22 +1,26 @@
-'use client';
+"use client";
 
-import React, { useState } from 'react';
 import {
+  FeedStatus,
+  OrgCalendarConfig,
+  UnifiedCalendarEvent,
+} from "@/config/calendars";
+import {
+  AlertTriangle,
   Check,
-  Search,
-  X,
-  RotateCw,
-  Rss,
-  SlidersHorizontal,
   ChevronDown,
+  Copy,
   Download,
   Globe,
+  RotateCw,
+  Rss,
+  Search,
+  SlidersHorizontal,
   Smartphone,
-  Copy,
-  AlertTriangle,
-} from 'lucide-react';
-import { OrgCalendarConfig, UnifiedCalendarEvent } from '@/config/calendars';
-import { OrgLogo } from './FraternalEmblems';
+  X,
+} from "lucide-react";
+import { useState } from "react";
+import { OrgLogo } from "./FraternalEmblems";
 
 interface FilterToolbarProps {
   sources: OrgCalendarConfig[];
@@ -30,7 +34,27 @@ interface FilterToolbarProps {
   onRefresh: () => void;
   isLoading: boolean;
   onOpenSubscribeModal: () => void;
-  warnings: string[];
+  feedStatus: FeedStatus[];
+}
+
+function describeFeedIssue(feed: FeedStatus): string {
+  switch (feed.state) {
+    case "stale": {
+      const asOf = feed.asOf
+        ? new Date(feed.asOf).toLocaleString(undefined, {
+            month: "short",
+            day: "numeric",
+            hour: "numeric",
+            minute: "2-digit",
+          })
+        : null;
+      return `${feed.orgName}: couldn't refresh, events are as of ${asOf ?? "earlier"}.`;
+    }
+    case "sample":
+      return `${feed.orgName}: showing sample data (development only).`;
+    default:
+      return `${feed.orgName}: temporarily unavailable.`;
+  }
 }
 
 export function FilterToolbar({
@@ -45,11 +69,12 @@ export function FilterToolbar({
   onRefresh,
   isLoading,
   onOpenSubscribeModal,
-  warnings,
+  feedStatus,
 }: FilterToolbarProps) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
-  const [showWarnings, setShowWarnings] = useState(false);
+
+  const feedIssues = feedStatus.filter((feed) => feed.state !== "ok");
 
   // Count events per org
   const orgEventCounts = sources.reduce<Record<string, number>>((acc, src) => {
@@ -60,8 +85,11 @@ export function FilterToolbar({
   const allSelected = selectedOrgIds.size === sources.length;
   const noneSelected = selectedOrgIds.size === 0;
 
-  const origin = typeof window !== 'undefined' ? window.location.origin : '';
-  const masterWebcal = `${origin}/api/calendar/master.ics`.replace(/^https?:\/\//i, 'webcal://');
+  const origin = typeof window !== "undefined" ? window.location.origin : "";
+  const masterWebcal = `${origin}/api/calendar/master.ics`.replace(
+    /^https?:\/\//i,
+    "webcal://",
+  );
   const masterHttp = `${origin}/api/calendar/master.ics`;
 
   const handleCopyLink = async (url: string, key: string) => {
@@ -76,29 +104,25 @@ export function FilterToolbar({
 
   return (
     <section aria-label="Calendar Controls and Filters" className="space-y-3.5">
-      {/* Warning Notification Banner if any feeds had issues */}
-      {warnings.length > 0 && (
-        <div className="rounded-xl border border-amber-300 dark:border-amber-700/60 bg-amber-50 dark:bg-amber-950/40 p-3 text-amber-900 dark:text-amber-200 text-xs flex items-start justify-between gap-3 shadow-xs">
-          <div className="flex items-start gap-2.5">
-            <AlertTriangle className="w-4 h-4 text-amber-600 dark:text-amber-400 mt-0.5 flex-shrink-0" />
-            <div>
-              <span className="font-bold">Feed Notice: </span>
-              {warnings.length} feed notice{warnings.length > 1 ? 's' : ''} detected. (Serving cached jurisdictional events).
-              {showWarnings ? (
-                <ul className="mt-1.5 list-disc list-inside space-y-0.5 opacity-95">
-                  {warnings.map((w, i) => (
-                    <li key={i} className="break-all font-mono text-[11px]">{w}</li>
-                  ))}
-                </ul>
-              ) : null}
+      {/* Notice when a calendar couldn't be reached (plain language; technical details stay in server logs) */}
+      {feedIssues.length > 0 && (
+        <div
+          role="status"
+          className="rounded-xl border border-amber-300 dark:border-amber-700/60 bg-amber-50 dark:bg-amber-950/40 p-3 text-amber-900 dark:text-amber-200 text-xs flex items-start gap-2.5 shadow-xs"
+        >
+          <AlertTriangle className="w-4 h-4 text-amber-600 dark:text-amber-400 mt-0.5 flex-shrink-0" />
+          <div>
+            <div className="font-bold">
+              {feedIssues.length === 1
+                ? "One calendar could not be updated"
+                : `${feedIssues.length} calendars could not be updated`}
             </div>
+            <ul className="mt-1 space-y-0.5">
+              {feedIssues.map((feed) => (
+                <li key={feed.orgId}>{describeFeedIssue(feed)}</li>
+              ))}
+            </ul>
           </div>
-          <button
-            onClick={() => setShowWarnings(!showWarnings)}
-            className="text-[11px] font-semibold underline underline-offset-2 flex-shrink-0 hover:text-amber-950 dark:hover:text-amber-100 focus:outline-none focus:ring-1 focus:ring-[#D4AF37]"
-          >
-            {showWarnings ? 'Hide details' : 'View details'}
-          </button>
         </div>
       )}
 
@@ -118,7 +142,7 @@ export function FilterToolbar({
             />
             {searchQuery && (
               <button
-                onClick={() => onSearchChange('')}
+                onClick={() => onSearchChange("")}
                 className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-[#0B2545] dark:hover:text-slate-200 focus:outline-none"
                 aria-label="Clear search"
               >
@@ -136,8 +160,8 @@ export function FilterToolbar({
                 disabled={allSelected}
                 className={`px-3 py-1.5 rounded-lg font-semibold transition-all ${
                   allSelected
-                    ? 'text-slate-400 dark:text-slate-500 cursor-not-allowed'
-                    : 'text-[#003366] dark:text-[#D4AF37] hover:bg-white dark:hover:bg-[#0B2545] hover:text-[#0B2545] shadow-xs'
+                    ? "text-slate-400 dark:text-slate-500 cursor-not-allowed"
+                    : "text-[#003366] dark:text-[#D4AF37] hover:bg-white dark:hover:bg-[#0B2545] hover:text-[#0B2545] shadow-xs"
                 }`}
                 aria-label="Select all organizations"
               >
@@ -148,8 +172,8 @@ export function FilterToolbar({
                 disabled={noneSelected}
                 className={`px-3 py-1.5 rounded-lg font-semibold transition-all ${
                   noneSelected
-                    ? 'text-slate-400 dark:text-slate-500 cursor-not-allowed'
-                    : 'text-[#003366] dark:text-[#D4AF37] hover:bg-white dark:hover:bg-[#0B2545] hover:text-[#0B2545] shadow-xs'
+                    ? "text-slate-400 dark:text-slate-500 cursor-not-allowed"
+                    : "text-[#003366] dark:text-[#D4AF37] hover:bg-white dark:hover:bg-[#0B2545] hover:text-[#0B2545] shadow-xs"
                 }`}
                 aria-label="Clear all organizations"
               >
@@ -165,7 +189,9 @@ export function FilterToolbar({
               title="Refresh calendar feeds from servers"
               aria-label="Refresh calendar feeds"
             >
-              <RotateCw className={`w-4 h-4 ${isLoading ? 'animate-spin text-[#D4AF37]' : ''}`} />
+              <RotateCw
+                className={`w-4 h-4 ${isLoading ? "animate-spin text-[#D4AF37]" : ""}`}
+              />
             </button>
 
             {/* Subscribe Dropdown Trigger (Imperial Gold CTA Button) */}
@@ -206,8 +232,12 @@ export function FilterToolbar({
                       >
                         <Smartphone className="w-4 h-4 text-[#003366] dark:text-[#D4AF37]" />
                         <div>
-                          <div className="font-semibold text-[#0B2545] dark:text-white">Apple / Outlook</div>
-                          <div className="text-[10px] text-slate-400">One-click calendar sync</div>
+                          <div className="font-semibold text-[#0B2545] dark:text-white">
+                            Apple / Outlook
+                          </div>
+                          <div className="text-[10px] text-slate-400">
+                            One-click calendar sync
+                          </div>
                         </div>
                       </a>
 
@@ -220,8 +250,12 @@ export function FilterToolbar({
                       >
                         <Globe className="w-4 h-4 text-[#D4AF37]" />
                         <div>
-                          <div className="font-semibold text-[#0B2545] dark:text-white">Google Calendar</div>
-                          <div className="text-[10px] text-slate-400">Add to web calendar</div>
+                          <div className="font-semibold text-[#0B2545] dark:text-white">
+                            Google Calendar
+                          </div>
+                          <div className="text-[10px] text-slate-400">
+                            Add to web calendar
+                          </div>
                         </div>
                       </a>
 
@@ -233,24 +267,34 @@ export function FilterToolbar({
                       >
                         <Download className="w-4 h-4 text-slate-400" />
                         <div>
-                          <div className="font-semibold text-[#0B2545] dark:text-white">Download Calendar File (.ics)</div>
-                          <div className="text-[10px] text-slate-400">Offline calendar backup (master.ics)</div>
+                          <div className="font-semibold text-[#0B2545] dark:text-white">
+                            Download Calendar File (.ics)
+                          </div>
+                          <div className="text-[10px] text-slate-400">
+                            Offline calendar backup (master.ics)
+                          </div>
                         </div>
                       </a>
 
                       <button
-                        onClick={() => handleCopyLink(masterHttp, 'quick-copy')}
+                        onClick={() => handleCopyLink(masterHttp, "quick-copy")}
                         className="w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-[#003366] transition-colors text-left"
                       >
                         <div className="flex items-center gap-2.5">
                           <Copy className="w-4 h-4 text-slate-400" />
                           <div>
-                            <div className="font-semibold text-[#0B2545] dark:text-white">Copy Calendar Link</div>
-                            <div className="text-[10px] text-slate-400">Paste in Apple, Outlook, or Google</div>
+                            <div className="font-semibold text-[#0B2545] dark:text-white">
+                              Copy Calendar Link
+                            </div>
+                            <div className="text-[10px] text-slate-400">
+                              Paste in Apple, Outlook, or Google
+                            </div>
                           </div>
                         </div>
-                        {copiedKey === 'quick-copy' && (
-                          <span className="text-[10px] text-emerald-600 font-bold">Copied!</span>
+                        {copiedKey === "quick-copy" && (
+                          <span className="text-[10px] text-emerald-600 font-bold">
+                            Copied!
+                          </span>
                         )}
                       </button>
                     </div>
@@ -291,8 +335,8 @@ export function FilterToolbar({
               onClick={() => onToggleOrg(src.id)}
               className={`group relative inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all duration-150 cursor-pointer shadow-xs border focus:outline-none focus:ring-2 focus:ring-[#D4AF37] ${
                 isSelected
-                  ? 'border-transparent shadow-sm'
-                  : 'bg-white dark:bg-[#0B2545] text-slate-700 dark:text-slate-300 border-slate-300 dark:border-slate-700 hover:border-slate-400'
+                  ? "border-transparent shadow-sm"
+                  : "bg-white dark:bg-[#0B2545] text-slate-700 dark:text-slate-300 border-slate-300 dark:border-slate-700 hover:border-slate-400"
               }`}
               style={{
                 backgroundColor: isSelected ? src.color.primary : undefined,
@@ -305,9 +349,7 @@ export function FilterToolbar({
               {/* Checkmark or Colored Pip */}
               <span
                 className={`w-3.5 h-3.5 rounded-full flex items-center justify-center transition-colors flex-shrink-0 ${
-                  isSelected
-                    ? 'bg-black/25 text-white'
-                    : 'text-transparent'
+                  isSelected ? "bg-black/25 text-white" : "text-transparent"
                 }`}
                 style={{
                   backgroundColor: !isSelected ? src.color.primary : undefined,
@@ -319,7 +361,11 @@ export function FilterToolbar({
               </span>
 
               {/* Official Brand Logo */}
-              <OrgLogo orgId={src.id} size={20} className="w-5 h-5 flex-shrink-0" />
+              <OrgLogo
+                orgId={src.id}
+                size={20}
+                className="w-5 h-5 flex-shrink-0"
+              />
 
               <span className="font-semibold">{src.name}</span>
 
@@ -327,8 +373,8 @@ export function FilterToolbar({
               <span
                 className={`px-1.5 py-0.2 rounded-full text-[10px] font-mono font-bold ${
                   isSelected
-                    ? 'bg-black/20 text-white'
-                    : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300'
+                    ? "bg-black/20 text-white"
+                    : "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300"
                 }`}
               >
                 {count}
