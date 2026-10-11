@@ -1,4 +1,5 @@
 import { UnifiedCalendarEvent } from '@/config/calendars';
+import { ICS_BRAND } from '@/config/site';
 
 /**
  * Escapes characters for RFC 5545 text fields
@@ -97,15 +98,15 @@ export function foldIcsLine(line: string): string {
  */
 export function generateMasterIcs(
   events: UnifiedCalendarEvent[],
-  calendarName = 'Prince Hall Masonic Temple & Jurisdictional Calendar',
-  calendarDesc = 'Unified Jurisdictional Schedule for MWPHGLDC, GTGC, PHFAMOESCEF, and THC'
+  calendarName: string = ICS_BRAND.name,
+  calendarDesc: string = ICS_BRAND.description
 ): string {
   const nowStamp = formatIcsDateTimeUtc(new Date());
 
   const rawLines: string[] = [
     'BEGIN:VCALENDAR',
     'VERSION:2.0',
-    'PRODID:-//PHFAMOESCEF//Jurisdictional Calendar//EN',
+    `PRODID:${ICS_BRAND.prodId}`,
     'CALSCALE:GREGORIAN',
     'METHOD:PUBLISH',
     `X-WR-CALNAME:${escapeIcsText(calendarName)}`,

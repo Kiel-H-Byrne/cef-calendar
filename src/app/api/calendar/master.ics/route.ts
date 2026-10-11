@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { fetchAllCalendarFeeds } from '@/lib/feedFetcher';
+import { ICS_BRAND } from '@/config/site';
 import { generateMasterIcs } from '@/lib/icsGenerator';
 
 export const dynamic = 'force-dynamic';
@@ -28,11 +29,11 @@ export async function GET(request: NextRequest) {
 
     const calName = targetOrg
       ? `${targetOrg.name} Events`
-      : 'Prince Hall Masonic Temple & Jurisdictional Calendar';
+      : ICS_BRAND.name;
 
     const calDesc = targetOrg
       ? `Calendar feed for ${targetOrg.name}`
-      : 'Unified Jurisdictional Schedule for MWPHGLDC, GTGC, PHFAMOESCEF, and THC';
+      : ICS_BRAND.description;
 
     const filename = 'master.ics';
 
@@ -66,7 +67,7 @@ export async function GET(request: NextRequest) {
   } catch (error: unknown) {
     console.error('Error generating master ICS feed:', error);
     return new NextResponse(
-      `BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//PHFAMOESCEF//Jurisdictional Calendar//EN\r\nEND:VCALENDAR\r\n`,
+      `BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:${ICS_BRAND.prodId}\r\nEND:VCALENDAR\r\n`,
       {
         status: 500,
         headers: {

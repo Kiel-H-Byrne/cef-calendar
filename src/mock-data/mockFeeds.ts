@@ -1,3 +1,9 @@
+/**
+ * FAKE SAMPLE DATA FOR LOCAL DEVELOPMENT AND TESTING ONLY.
+ *
+ * These events do not exist. They are loaded only when NODE_ENV is not "production" AND
+ * ENABLE_MOCK_FALLBACK="true" (see feedFetcher.ts), and must never be shown to end users.
+ */
 export const MOCK_ICS_FEEDS: Record<string, string> = {
   'org-alpha': `BEGIN:VCALENDAR
 VERSION:2.0

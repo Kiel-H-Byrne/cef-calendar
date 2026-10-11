@@ -12,20 +12,18 @@ import {
   Radio,
 } from 'lucide-react';
 import { OrgCalendarConfig } from '@/config/calendars';
-import {
-  TaxExemptBadge,
-  LocationBadge,
-  WebsiteLinkBadge,
-  OrgLogo,
-} from './FraternalEmblems';
+import { SITE } from '@/config/site';
+import { OrgLogo } from './FraternalEmblems';
 
 interface SubscribeModalProps {
   sources: OrgCalendarConfig[];
+  /** Feeds that can't currently be reached; their individual subscribe links are withheld */
+  unavailableOrgIds?: Set<string>;
   isOpen: boolean;
   onClose: () => void;
 }
 
-export function SubscribeModal({ sources, isOpen, onClose }: SubscribeModalProps) {
+export function SubscribeModal({ sources, unavailableOrgIds, isOpen, onClose }: SubscribeModalProps) {
   const origin = typeof window !== 'undefined' ? window.location.origin : '';
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
 
@@ -41,7 +39,7 @@ export function SubscribeModal({ sources, isOpen, onClose }: SubscribeModalProps
 
   if (!isOpen) return null;
 
-  const hostWithProto = origin || 'https://www.phfamoescef.com';
+  const hostWithProto = origin || SITE.url;
   const masterHttpUrl = `${hostWithProto}/api/calendar/master.ics`;
   const masterWebcalUrl = masterHttpUrl.replace(/^https?:\/\//i, 'webcal://');
   // Google's subscribe-by-URL flow expects a webcal:// scheme in `cid`; an https:// value fails with "can't load calendar"
@@ -71,8 +69,8 @@ export function SubscribeModal({ sources, isOpen, onClose }: SubscribeModalProps
       >
         {/* Modal Header with Official Brand Logos (1: CEF, 2: THC, 3: MWPHGLDC, 4: GTGC) */}
         <div className="p-5 sm:p-6 bg-[#0B2545] border-b border-[#D4AF37] flex items-center justify-between text-white">
-          <div className="flex items-center gap-3">
-            <div className="flex items-center gap-1.5 p-1 rounded-xl bg-white/10 border border-[#D4AF37]/50 shadow-[0_0_10px_rgba(212,175,55,0.2)]">
+          <div className="flex flex-col items-start sm:flex-row sm:items-center gap-2.5 sm:gap-3">
+            <div className="flex flex-shrink-0 items-center gap-1.5 p-1 rounded-xl bg-white/10 border border-[#D4AF37]/50 shadow-[0_0_10px_rgba(212,175,55,0.2)]">
               <Image
                 src="/cef_logo.jpeg"
                 alt="PHFAMOESCEF"
@@ -107,7 +105,7 @@ export function SubscribeModal({ sources, isOpen, onClose }: SubscribeModalProps
                 id="subscribe-modal-title"
                 className="text-lg sm:text-xl font-bold text-white tracking-tight font-heading"
               >
-                Subscribe to Jurisdictional Calendars
+                Subscribe to the Unified Calendar
               </h2>
               <p className="text-xs text-slate-300 mt-0.5">
                 Sync live schedules directly to Apple Calendar, Microsoft Outlook, or Google Calendar
@@ -133,7 +131,7 @@ export function SubscribeModal({ sources, isOpen, onClose }: SubscribeModalProps
                   <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#D4AF37]"></span>
                 </span>
                 <span className="font-bold text-[#0B2545] dark:text-[#F8F9FA] text-sm font-heading">
-                  Master Jurisdictional Calendar (All Feeds)
+                  {SITE.name} (All Feeds)
                 </span>
               </div>
               <span className="text-[10px] font-mono uppercase bg-[#003366] text-[#D4AF37] border border-[#D4AF37]/40 px-2 py-0.5 rounded font-bold">
@@ -233,6 +231,11 @@ export function SubscribeModal({ sources, isOpen, onClose }: SubscribeModalProps
                       </div>
                     </div>
 
+                    {unavailableOrgIds?.has(src.id) ? (
+                      <span className="self-end sm:self-center px-3 py-1.5 text-xs font-semibold rounded-lg bg-amber-50 dark:bg-amber-950/40 border border-amber-300 dark:border-amber-700/60 text-amber-900 dark:text-amber-200">
+                        Temporarily unavailable
+                      </span>
+                    ) : (
                     <div className="flex items-center gap-1.5 self-end sm:self-center">
                       <a
                         href={orgWebcal}
@@ -263,6 +266,7 @@ export function SubscribeModal({ sources, isOpen, onClose }: SubscribeModalProps
                         )}
                       </button>
                     </div>
+                    )}
                   </div>
                 );
               })}
@@ -270,13 +274,8 @@ export function SubscribeModal({ sources, isOpen, onClose }: SubscribeModalProps
           </div>
         </div>
 
-        {/* Modal Footer with phfamoescef.com link */}
-        <div className="p-4 bg-slate-50 dark:bg-[#07192F] border-t border-slate-200 dark:border-slate-800 flex items-center justify-between flex-wrap gap-2">
-          <div className="flex items-center gap-2 flex-wrap">
-            <TaxExemptBadge />
-            <LocationBadge />
-            <WebsiteLinkBadge />
-          </div>
+        {/* Modal Footer */}
+        <div className="p-4 bg-slate-50 dark:bg-[#07192F] border-t border-slate-200 dark:border-slate-800 flex items-center justify-end">
           <button
             onClick={onClose}
             className="px-4 py-2 text-xs font-bold rounded-lg bg-[#003366] hover:bg-[#0B2545] text-white transition-colors focus:outline-none focus:ring-2 focus:ring-[#D4AF37]"

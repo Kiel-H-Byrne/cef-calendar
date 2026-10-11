@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getCalendarSources } from '@/config/calendars';
+import { ICS_BRAND } from '@/config/site';
 import { fetchAllCalendarFeeds } from '@/lib/feedFetcher';
 import { generateMasterIcs } from '@/lib/icsGenerator';
 
@@ -28,9 +29,7 @@ export async function GET(
         forceRefresh,
       });
 
-      const calName = 'Prince Hall Masonic Temple & Jurisdictional Calendar';
-      const calDesc = 'Unified Jurisdictional Schedule for MWPHGLDC, GTGC, PHFAMOESCEF, and THC';
-      const icsContent = generateMasterIcs(data.events, calName, calDesc);
+      const icsContent = generateMasterIcs(data.events, ICS_BRAND.name, ICS_BRAND.description);
 
       // Fast ETag computation
       const etagSource = `master-${data.events.length}-${data.lastUpdated}`;

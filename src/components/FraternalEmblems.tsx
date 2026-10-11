@@ -86,63 +86,6 @@ export function FiveColorOesStrip({
 }
 
 /**
- * 501(c)(3) Tax-Exempt Status Badge
- * Compliant with Brand Spec Section 5.D
- */
-export function TaxExemptBadge({ className = "" }: { className?: string }) {
-  return (
-    <span
-      className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold tracking-wide bg-[#FFFBEB] text-[#92400E] border border-[#FDE68A] shadow-xs ${className}`}
-    >
-      <span
-        className="w-1.5 h-1.5 rounded-full bg-[#D4AF37]"
-        aria-hidden="true"
-      />
-      501(c)(3) Tax-Exempt
-    </span>
-  );
-}
-
-/**
- * Landmark Location Badge (1000 U St NW)
- * Compliant with Brand Spec Section 5.D
- */
-export function LocationBadge({ className = "" }: { className?: string }) {
-  return (
-    <span
-      className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold tracking-wide bg-[#EFF6FF] text-[#1E40AF] border border-[#BFDBFE] shadow-xs ${className}`}
-    >
-      <span
-        className="w-1.5 h-1.5 rounded-full bg-[#1E40AF]"
-        aria-hidden="true"
-      />
-      1000 U Street NW • Washington, D.C.
-    </span>
-  );
-}
-
-/**
- * Official Website Link Badge for phfamoescef.com
- */
-export function WebsiteLinkBadge({ className = "" }: { className?: string }) {
-  return (
-    <a
-      href="https://www.phfamoescef.com"
-      target="_blank"
-      rel="noopener noreferrer"
-      className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold tracking-wide bg-white dark:bg-[#0B2545] text-[#003366] dark:text-[#D4AF37] border border-slate-300 dark:border-slate-700 hover:border-[#D4AF37] transition-colors shadow-2xs ${className}`}
-      title="Visit official website: phfamoescef.com"
-    >
-      <span
-        className="w-1.5 h-1.5 rounded-full bg-[#D4AF37]"
-        aria-hidden="true"
-      />
-      phfamoescef.com
-    </a>
-  );
-}
-
-/**
  * Fallback Masonic Square and Compasses Vector Emblem
  */
 export function MasonicEmblem({
