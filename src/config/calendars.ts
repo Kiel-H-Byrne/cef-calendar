@@ -29,7 +29,7 @@ export const CALENDAR_SOURCES: OrgCalendarConfig[] = [
     sourceType: "outlook",
     icsUrl:
       process.env.CAL_BETA_ICS_URL ||
-      "https://outlook.office365.com/owa/calendar/7bfa71fa1f754f829b6a73c594bd24fb@phfamoescef.org/b07efc814e764250a08f308278edd82118280917116044950697/calendar.ics",
+      "https://outlook.office365.com/owa/calendar/529b87f414144c8d9b13d2b00bc496d0@phfamoescef.org/9373d74ae62f4813a804376128256ba711959120867787912753/calendar.ics",
     color: { primary: "#6B21A8", secondary: "#581C87", text: "#ffffff" }, // Regal Purple / Foundation
   },
   {
@@ -39,7 +39,7 @@ export const CALENDAR_SOURCES: OrgCalendarConfig[] = [
     sourceType: "outlook",
     icsUrl:
       process.env.CAL_GAMMA_ICS_URL ||
-      "https://outlook.office365.com/owa/calendar/0c65f07100374ca48d3737339b79d615%40phfamoescef.org/b8db7fd7e1d740f284f071e755d6071b1585401539968367440/calendar.ics",
+      "https://outlook.office365.com/owa/calendar/a1756b60667440c7b8da3fbd8a416f86@phfamoescef.org/781933d90c08402782f94d79e66cd6ab18354436866183602035/calendar.ics",
     color: { primary: "#047857", secondary: "#065F46", text: "#ffffff" }, // Historic Temple Stewardship Emerald
   },
   {
@@ -49,7 +49,7 @@ export const CALENDAR_SOURCES: OrgCalendarConfig[] = [
     sourceType: "outlook",
     icsUrl:
       process.env.CAL_DELTA_ICS_URL ||
-      "https://outlook.office365.com/owa/calendar/d077a94286064327a13905b7a6cb44c8@phfamoescef.org/e1cba4c7ef0746f49d26b0b0fa348aee8543287157844258083/calendar.ics",
+      "https://outlook.office365.com/owa/calendar/e6c940ff9516447b87f7a9e7799c3f08@phfamoescef.org/6ba280b1e8a44faeac1a89fc9453bf0815357297715037404933/calendar.ics",
     color: { primary: "#BE123C", secondary: "#9F1239", text: "#ffffff" }, // OES Crimson Star
   },
   {
