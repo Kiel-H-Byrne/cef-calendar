@@ -19,10 +19,20 @@ import { FiveColorOesStrip, OrgLogo } from './FraternalEmblems';
 interface EventModalProps {
   event: UnifiedCalendarEvent | null;
   onClose: () => void;
+  isSignage?: boolean;
 }
 
-export function EventModal({ event, onClose }: EventModalProps) {
+export function EventModal({ event, onClose, isSignage = false }: EventModalProps) {
   const [copied, setCopied] = useState(false);
+
+  // Auto-close after 30 seconds on unattended digital signage displays
+  useEffect(() => {
+    if (!isSignage || !event) return;
+    const timer = setTimeout(() => {
+      onClose();
+    }, 30000);
+    return () => clearTimeout(timer);
+  }, [isSignage, event, onClose]);
 
   // Close on Escape key press
   useEffect(() => {
@@ -325,27 +335,36 @@ export function EventModal({ event, onClose }: EventModalProps) {
             </button>
           </div>
 
-          <div className="flex items-center gap-2">
-            {/* Secondary Button: Fraternal Blue Outline */}
-            <a
-              href={googleCalUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold rounded-lg border-2 border-[#003366] dark:border-[#D4AF37] text-[#003366] dark:text-[#D4AF37] bg-transparent hover:bg-[#003366] hover:text-white dark:hover:bg-[#D4AF37] dark:hover:text-[#0B2545] transition-all focus:outline-none focus:ring-2 focus:ring-[#D4AF37]"
-            >
-              <ExternalLink className="w-3.5 h-3.5" />
-              Google Calendar
-            </a>
-
-            {/* Primary Action Button: Imperial Gold CTA */}
+          {isSignage ? (
             <button
-              onClick={handleDownloadIcs}
-              className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-bold rounded-lg bg-[#D4AF37] hover:bg-[#B8952E] text-[#0B2545] transition-all transform hover:scale-[1.02] shadow-[0_0_15px_rgba(212,175,55,0.3)] focus:outline-none focus:ring-2 focus:ring-[#D4AF37]"
+              onClick={onClose}
+              className="ml-auto inline-flex items-center gap-1.5 px-4 py-2 text-xs font-bold rounded-lg bg-[#D4AF37] hover:bg-[#B8952E] text-[#0B2545] transition-all shadow-xs focus:outline-none focus:ring-2 focus:ring-[#D4AF37]"
             >
-              <Download className="w-3.5 h-3.5" />
-              Download .ics
+              Close
             </button>
-          </div>
+          ) : (
+            <div className="flex items-center gap-2">
+              {/* Secondary Button: Fraternal Blue Outline */}
+              <a
+                href={googleCalUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold rounded-lg border-2 border-[#003366] dark:border-[#D4AF37] text-[#003366] dark:text-[#D4AF37] bg-transparent hover:bg-[#003366] hover:text-white dark:hover:bg-[#D4AF37] dark:hover:text-[#0B2545] transition-all focus:outline-none focus:ring-2 focus:ring-[#D4AF37]"
+              >
+                <ExternalLink className="w-3.5 h-3.5" />
+                Google Calendar
+              </a>
+
+              {/* Primary Action Button: Imperial Gold CTA */}
+              <button
+                onClick={handleDownloadIcs}
+                className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-bold rounded-lg bg-[#D4AF37] hover:bg-[#B8952E] text-[#0B2545] transition-all transform hover:scale-[1.02] shadow-[0_0_15px_rgba(212,175,55,0.3)] focus:outline-none focus:ring-2 focus:ring-[#D4AF37]"
+              >
+                <Download className="w-3.5 h-3.5" />
+                Download .ics
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </div>

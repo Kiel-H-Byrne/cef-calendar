@@ -12,6 +12,7 @@ import {
   Copy,
   Download,
   Globe,
+  Monitor,
   RotateCw,
   Rss,
   Search,
@@ -34,6 +35,7 @@ interface FilterToolbarProps {
   onRefresh: () => void;
   isLoading: boolean;
   onOpenSubscribeModal: () => void;
+  onOpenSignageModal?: () => void;
   feedStatus: FeedStatus[];
 }
 
@@ -69,6 +71,7 @@ export function FilterToolbar({
   onRefresh,
   isLoading,
   onOpenSubscribeModal,
+  onOpenSignageModal,
   feedStatus,
 }: FilterToolbarProps) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -194,6 +197,19 @@ export function FilterToolbar({
               />
             </button>
 
+            {/* Digital Signage / Kiosk Button */}
+            {onOpenSignageModal && (
+              <button
+                onClick={onOpenSignageModal}
+                className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold border border-slate-300 dark:border-slate-700 bg-white dark:bg-[#07192F] hover:bg-slate-50 dark:hover:bg-[#003366] text-[#003366] dark:text-[#D4AF37] transition-all shadow-xs focus:outline-none focus:ring-2 focus:ring-[#D4AF37]"
+                title="Digital Signage & Kiosk Integration (Xibo CMS)"
+                aria-label="Digital Signage and Kiosk Views"
+              >
+                <Monitor className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">Signage &amp; Kiosk</span>
+              </button>
+            )}
+
             {/* Subscribe Dropdown Trigger (Imperial Gold CTA Button) */}
             <div className="relative">
               <button
@@ -299,13 +315,25 @@ export function FilterToolbar({
                       </button>
                     </div>
 
-                    <div className="p-2 border-t border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-[#07192F]">
+                    <div className="p-2 border-t border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-[#07192F] space-y-1">
+                      {onOpenSignageModal && (
+                        <button
+                          onClick={() => {
+                            setDropdownOpen(false);
+                            onOpenSignageModal();
+                          }}
+                          className="w-full py-1 text-center text-xs font-semibold text-[#0B2545] dark:text-[#F8F9FA] hover:text-[#D4AF37] dark:hover:text-[#D4AF37] transition-colors flex items-center justify-center gap-1.5"
+                        >
+                          <Monitor className="w-3.5 h-3.5 text-[#D4AF37]" />
+                          <span>Digital Signage Views (Xibo CMS)</span>
+                        </button>
+                      )}
                       <button
                         onClick={() => {
                           setDropdownOpen(false);
                           onOpenSubscribeModal();
                         }}
-                        className="w-full py-1.5 text-center text-xs font-bold text-[#003366] dark:text-[#D4AF37] hover:underline transition-colors"
+                        className="w-full py-1 text-center text-xs font-bold text-[#003366] dark:text-[#D4AF37] hover:underline transition-colors"
                       >
                         More options & individual feeds →
                       </button>

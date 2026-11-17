@@ -278,3 +278,77 @@ h1, h2, h3, h4, h5, h6 {
     scroll-behavior: auto !important;
   }
 }
+
+/* ==========================================================================
+   Digital Signage & Kiosk Display Optimizations (Xibo CMS)
+   ========================================================================== */
+.signage-root {
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+}
+
+.signage-root .fc {
+  height: 100% !important;
+}
+
+.signage-root .fc-scrollgrid {
+  height: 100% !important;
+  border-radius: 0.75rem !important;
+  border-color: var(--fc-border-color) !important;
+}
+
+/* High-contrast column headers for digital signage */
+.signage-root .fc-col-header-cell {
+  background-color: #0B2545 !important;
+}
+
+.signage-root .fc-col-header-cell-cushion {
+  color: #D4AF37 !important;
+  font-weight: 800 !important;
+  font-size: 0.875rem !important;
+  letter-spacing: 0.05em !important;
+  padding: 0.5rem 0.25rem !important;
+}
+
+/* TimeGrid slots in signage mode: generous vertical height for readability */
+.signage-root .fc-timegrid-slot {
+  height: 3.25rem !important;
+}
+
+.signage-root .fc-timegrid-slot-label-cushion {
+  font-weight: 700 !important;
+  font-size: 0.8125rem !important;
+  color: #0B2545;
+}
+
+@media (prefers-color-scheme: dark) {
+  .signage-root .fc-timegrid-slot-label-cushion {
+    color: #94A3B8;
+  }
+}
+
+/* Prominent Now-Indicator in signage mode */
+.signage-root .fc-timegrid-now-indicator-line {
+  border-color: #D4AF37 !important;
+  border-width: 2.5px !important;
+  z-index: 10 !important;
+}
+
+.signage-root .fc-timegrid-now-indicator-arrow {
+  border-color: #D4AF37 !important;
+  border-width: 6px 0 6px 7px !important;
+  z-index: 10 !important;
+}
+
+/* Month day cells: allow flexible height and vertical stacking without truncation */
+.signage-root .fc-daygrid-day-frame {
+  min-height: 100% !important;
+}
+
+.signage-root .fc-daygrid-day-events {
+  margin-top: 0.25rem !important;
+  margin-bottom: 0.25rem !important;
+}
+
