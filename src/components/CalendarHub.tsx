@@ -6,18 +6,23 @@ import {
   OrgCalendarConfig,
   UnifiedCalendarEvent,
 } from "@/config/calendars";
+import FullCalendar from "@fullcalendar/react";
 import { Calendar } from "lucide-react";
 import Image from "next/image";
-import { useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { SITE } from "@/config/site";
 import { CalendarView } from "./CalendarView";
 import { EventModal } from "./EventModal";
 import { FilterToolbar } from "./FilterToolbar";
 import { FiveColorOesStrip } from "./FraternalEmblems";
 import { Header } from "./Header";
+import { PrintHeader } from "./PrintHeader";
+import { SignageHeader } from "./SignageHeader";
+import { SignageModal } from "./SignageModal";
 import { SubscribeModal } from "./SubscribeModal";
 
-// Footer links to each organization's own site (underlined so they read as links)
+// Footer links to each organization's own site
 const ORG_LINK_CLASS =
   "font-bold text-white underline decoration-[#D4AF37]/50 underline-offset-2 hover:text-[#D4AF37] hover:decoration-[#D4AF37] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37] rounded-sm";
 
@@ -25,7 +30,76 @@ interface CalendarHubProps {
   initialData: EventsApiResponse;
 }
 
+/**
+ * Resolves organization IDs from comma-separated tokens matching ID, shortName, or name.
+ */
+function resolveOrgIdsFromParam(
+  param: string | null,
+  sources: OrgCalendarConfig[],
+): Set<string> | null {
+  if (!param) return null;
+  const tokens = param
+    .split(",")
+    .map((t) => t.trim().toLowerCase())
+    .filter(Boolean);
+  if (tokens.length === 0) return null;
+
+  const matched = new Set<string>();
+  for (const token of tokens) {
+    for (const src of sources) {
+      if (
+        src.id.toLowerCase() === token ||
+        src.shortName.toLowerCase() === token ||
+        src.name.toLowerCase().includes(token)
+      ) {
+        matched.add(src.id);
+      }
+    }
+  }
+  return matched.size > 0 ? matched : null;
+}
+
+/**
+ * Maps view query parameter (e.g. 'day', 'week', 'month') to FullCalendar view identifier.
+ */
+function mapQueryParamToFullCalendarView(
+  rawView: string | null,
+): string | undefined {
+  if (!rawView) return undefined;
+  const v = rawView.toLowerCase().trim();
+  switch (v) {
+    case "day":
+    case "today":
+      return "timeGridDay";
+    case "week":
+      return "timeGridWeek";
+    case "month":
+      return "dayGridMonth";
+    case "list":
+    case "schedule":
+    case "agenda":
+      return "listMonth";
+    case "daylist":
+      return "listDay";
+    case "timegridday":
+      return "timeGridDay";
+    case "timegridweek":
+      return "timeGridWeek";
+    case "daygridmonth":
+      return "dayGridMonth";
+    case "listmonth":
+      return "listMonth";
+    case "listday":
+      return "listDay";
+    default:
+      return undefined;
+  }
+}
+
 export function CalendarHub({ initialData }: CalendarHubProps) {
+  const searchParams = useSearchParams();
+  const calendarRef = useRef<FullCalendar | null>(null);
+
   const [events, setEvents] = useState<UnifiedCalendarEvent[]>(
     initialData.events,
   );
@@ -39,21 +113,92 @@ export function CalendarHub({ initialData }: CalendarHubProps) {
     initialData.lastUpdated,
   );
 
-  // By default, select all organizations
-  const [selectedOrgIds, setSelectedOrgIds] = useState<Set<string>>(
-    () => new Set(initialData.sources.map((s) => s.id)),
-  );
+  // Parse URL search parameters
+  const rawView = searchParams.get("view");
+  const targetView = mapQueryParamToFullCalendarView(rawView);
+
+  const signageParam =
+    searchParams.get("signage") ||
+    searchParams.get("kiosk") ||
+    searchParams.get("fullscreen") ||
+    searchParams.get("mode");
+
+  const isExplicitSignage =
+    signageParam === "true" || signageParam === "1" || signageParam === "yes";
+  const isExplicitNormal =
+    signageParam === "false" || signageParam === "0" || signageParam === "no";
+
+  // When ?view=day, ?view=week, etc. or ?signage=true is accessed, full-page signage mode is active
+  const isSignage =
+    isExplicitSignage || (Boolean(rawView) && !isExplicitNormal);
+
+  const orgParam =
+    searchParams.get("org") ||
+    searchParams.get("cal") ||
+    searchParams.get("calendar") ||
+    searchParams.get("calendars");
+  const dateParam = searchParams.get("date") || undefined;
+  const themeParam = searchParams.get("theme")?.toLowerCase();
+  const refreshParam = searchParams.get("refresh");
+
+  // Track explicit user selection if clicked in FilterToolbar; otherwise derive from orgParam or all sources
+  const [userSelectedOrgIds, setUserSelectedOrgIds] = useState<Set<string> | null>(null);
+
+  const selectedOrgIds = useMemo(() => {
+    if (userSelectedOrgIds !== null) return userSelectedOrgIds;
+    if (orgParam) {
+      const matched = resolveOrgIdsFromParam(orgParam, sources);
+      if (matched && matched.size > 0) return matched;
+    }
+    return new Set(sources.map((s) => s.id));
+  }, [userSelectedOrgIds, orgParam, sources]);
 
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedEvent, setSelectedEvent] =
     useState<UnifiedCalendarEvent | null>(null);
   const [isSubscribeOpen, setIsSubscribeOpen] = useState(false);
+  const [isSignageModalOpen, setIsSignageModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isPrinting, setIsPrinting] = useState(false);
+
+  // Detect print state to dynamically expand all events for full one-page printing
+  useEffect(() => {
+    const handleBeforePrint = () => setIsPrinting(true);
+    const handleAfterPrint = () => setIsPrinting(false);
+
+    window.addEventListener("beforeprint", handleBeforePrint);
+    window.addEventListener("afterprint", handleAfterPrint);
+
+    return () => {
+      window.removeEventListener("beforeprint", handleBeforePrint);
+      window.removeEventListener("afterprint", handleAfterPrint);
+    };
+  }, []);
+
+  const handlePrint = () => {
+    window.print();
+  };
+
+  // Signage header synchronization state
+  const [calendarTitle, setCalendarTitle] = useState("");
+  const [currentViewType, setCurrentViewType] = useState(
+    targetView || (isSignage ? "dayGridMonth" : "dayGridMonth"),
+  );
+
+  // Handle explicit ?theme=dark or ?theme=light query parameter
+  useEffect(() => {
+    if (themeParam === "dark") {
+      document.documentElement.classList.add("dark");
+    } else if (themeParam === "light") {
+      document.documentElement.classList.remove("dark");
+    }
+  }, [themeParam]);
 
   // Toggle single organization
   const handleToggleOrg = (orgId: string) => {
-    setSelectedOrgIds((prev) => {
-      const next = new Set(prev);
+    setUserSelectedOrgIds((prev) => {
+      const current = prev || selectedOrgIds;
+      const next = new Set(current);
       if (next.has(orgId)) {
         next.delete(orgId);
       } else {
@@ -65,19 +210,18 @@ export function CalendarHub({ initialData }: CalendarHubProps) {
 
   // Select all
   const handleSelectAll = () => {
-    setSelectedOrgIds(new Set(sources.map((s) => s.id)));
+    setUserSelectedOrgIds(new Set(sources.map((s) => s.id)));
   };
 
   // Clear all
   const handleClearAll = () => {
-    setSelectedOrgIds(new Set());
+    setUserSelectedOrgIds(new Set());
   };
 
   // Re-fetch calendar feeds from server with on-demand cache bypass and state reconciliation
-  const handleRefresh = async () => {
+  const handleRefresh = useCallback(async () => {
     setIsLoading(true);
     try {
-      // Bust any server ISR cache and fetch fresh external feeds
       const res = await fetch("/api/events?refresh=true", {
         cache: "no-store",
       });
@@ -86,28 +230,7 @@ export function CalendarHub({ initialData }: CalendarHubProps) {
         setEvents(data.events);
         setFeedStatus(data.feedStatus);
         setLastUpdated(data.lastUpdated);
-
-        // Reconcile organizations dynamically
-        const newSources = data.sources || [];
-        setSources(newSources);
-
-        setSelectedOrgIds((prev) => {
-          const next = new Set<string>();
-          const validIds = new Set(newSources.map((s) => s.id));
-          // Preserve valid active selections
-          for (const id of prev) {
-            if (validIds.has(id)) next.add(id);
-          }
-          // Auto-select any newly added organizations
-          for (const s of newSources) {
-            if (!sources.some((existing) => existing.id === s.id)) {
-              next.add(s.id);
-            }
-          }
-          return next.size > 0 ? next : validIds;
-        });
-
-        // Trigger on-demand ISR revalidation in background
+        setSources(data.sources || []);
         fetch("/api/revalidate", { method: "POST" }).catch(() => {});
       }
     } catch (err) {
@@ -115,8 +238,99 @@ export function CalendarHub({ initialData }: CalendarHubProps) {
     } finally {
       setIsLoading(false);
     }
+  }, []);
+
+  // 24/7 Digital Signage Auto-Refresh interval (defaults to 5 minutes)
+  useEffect(() => {
+    if (!isSignage) return;
+
+    let intervalMs = 5 * 60 * 1000; // default 5 minutes
+    if (refreshParam) {
+      const num = parseInt(refreshParam, 10);
+      if (!isNaN(num) && num > 0) {
+        intervalMs = num < 60 ? num * 60 * 1000 : num * 1000;
+      }
+    }
+
+    const timer = setInterval(() => {
+      handleRefresh();
+    }, intervalMs);
+
+    return () => clearInterval(timer);
+  }, [isSignage, refreshParam, handleRefresh]);
+
+  // Handle switching views from SignageHeader
+  const handleSignageViewChange = (newView: string) => {
+    setCurrentViewType(newView);
+    if (calendarRef.current) {
+      calendarRef.current.getApi().changeView(newView);
+    }
+    // Update URL query parameter shallowly
+    if (typeof window !== "undefined") {
+      const url = new URL(window.location.href);
+      let viewParam = "day";
+      if (newView === "dayGridMonth") viewParam = "month";
+      else if (newView === "timeGridWeek") viewParam = "week";
+      else if (newView.startsWith("list")) viewParam = "schedule";
+      url.searchParams.set("view", viewParam);
+      window.history.replaceState({}, "", url.toString());
+    }
   };
 
+  // =========================================================================
+  // 1. FULL-SCREEN DIGITAL SIGNAGE CMS VIEW (Priority 100% on the calendar)
+  // =========================================================================
+  if (isSignage) {
+    return (
+      <div className="signage-root flex flex-col bg-[#F8F9FA] dark:bg-[#07192F] text-[#1A1D20] dark:text-[#F8F9FA] font-body transition-colors">
+        {/* Sleek Signage Header Bar: Legend with OrgLogos & colors, Live Clock, Nav, & View Switcher */}
+        <SignageHeader
+          sources={sources}
+          selectedOrgIds={selectedOrgIds}
+          currentTitle={calendarTitle}
+          activeView={currentViewType}
+          onViewChange={handleSignageViewChange}
+          onPrev={() => calendarRef.current?.getApi().prev()}
+          onNext={() => calendarRef.current?.getApi().next()}
+          onToday={() => calendarRef.current?.getApi().today()}
+          lastUpdated={lastUpdated}
+          onRefresh={handleRefresh}
+          isLoading={isLoading}
+          totalEvents={events.length}
+        />
+
+        {/* Priority 100% on the Calendar: No branding banners, footers, or external links */}
+        <main className="flex-1 w-full h-full min-h-0 p-1 sm:p-2 overflow-hidden flex flex-col">
+          <CalendarView
+            events={events}
+            sources={sources}
+            selectedOrgIds={selectedOrgIds}
+            searchQuery=""
+            onEventClick={(ev) => setSelectedEvent(ev)}
+            isSignage={true}
+            initialViewType={targetView || "dayGridMonth"}
+            initialDate={dateParam}
+            calendarRefProp={calendarRef}
+            onViewTypeChange={setCurrentViewType}
+            onTitleChange={setCalendarTitle}
+          />
+        </main>
+
+        {/* Event Detail Modal (Safe Kiosk Mode: auto-dismisses after 30s) */}
+        {selectedEvent && (
+          <EventModal
+            event={selectedEvent}
+            onClose={() => setSelectedEvent(null)}
+            isSignage={true}
+          />
+        )}
+      </div>
+    );
+  }
+
+  // =========================================================================
+  // 2. STANDARD PUBLIC WEBSITE VIEW (Full Header, Filters, Calendar, Footer)
+  // =========================================================================
   return (
     <div className="min-h-screen bg-[#F8F9FA] dark:bg-[#07192F] text-[#1A1D20] dark:text-[#F8F9FA] flex flex-col font-body transition-colors">
       {/* Top Header */}
@@ -141,7 +355,18 @@ export function CalendarHub({ initialData }: CalendarHubProps) {
           onRefresh={handleRefresh}
           isLoading={isLoading}
           onOpenSubscribeModal={() => setIsSubscribeOpen(true)}
+          onOpenSignageModal={() => setIsSignageModalOpen(true)}
+          onPrint={handlePrint}
           feedStatus={feedStatus}
+        />
+
+        {/* Dedicated Clean Header for PDF / Printer Exports */}
+        <PrintHeader
+          title={calendarTitle}
+          sources={sources}
+          selectedOrgIds={selectedOrgIds}
+          searchQuery={searchQuery}
+          totalEvents={events.length}
         />
 
         {/* Interactive FullCalendar View */}
@@ -151,6 +376,13 @@ export function CalendarHub({ initialData }: CalendarHubProps) {
           selectedOrgIds={selectedOrgIds}
           searchQuery={searchQuery}
           onEventClick={(ev) => setSelectedEvent(ev)}
+          isSignage={false}
+          isPrinting={isPrinting}
+          initialViewType={targetView}
+          initialDate={dateParam}
+          calendarRefProp={calendarRef}
+          onViewTypeChange={setCurrentViewType}
+          onTitleChange={setCalendarTitle}
         />
       </main>
 
@@ -266,36 +498,34 @@ export function CalendarHub({ initialData }: CalendarHubProps) {
                   />
                   <span>
                     <a
-                      href="https://www.mwphgldc.com"
+                      href="https://mwphgldc.com"
                       target="_blank"
                       rel="noopener noreferrer"
                       className={ORG_LINK_CLASS}
                     >
                       MWPHGLDC
                     </a>
-                    : Most Worshipful Prince Hall Grand Lodge of D.C. (Est.
-                    1825)
+                    : Most Worshipful Prince Hall Grand Lodge DC
                   </span>
                 </li>
                 <li className="flex items-center gap-2">
                   <Image
                     src="/gtgc_logo.jpg"
-                    alt="GTGC"
+                    alt="GTGC OES"
                     width={18}
                     height={18}
                     className="w-4.5 h-4.5 rounded-full bg-white object-contain"
                   />
                   <span>
                     <a
-                      href="https://www.facebook.com/gtgcdc/"
+                      href="https://gtgcoes.org"
                       target="_blank"
                       rel="noopener noreferrer"
                       className={ORG_LINK_CLASS}
                     >
-                      GTGC
+                      GTGC OES
                     </a>
-                    : Georgiana Thomas Grand Chapter, Order of the Eastern
-                    Star, PHA
+                    : Georgiana Thomas Grand Chapter
                   </span>
                 </li>
               </ul>
@@ -312,13 +542,19 @@ export function CalendarHub({ initialData }: CalendarHubProps) {
                 Engineered to meet <strong>WCAG 2.1 AA</strong> accessibility
                 standards.
               </p>
-              <div className="pt-2">
+              <div className="pt-2 flex flex-wrap gap-2">
                 <button
                   onClick={() => setIsSubscribeOpen(true)}
                   className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold bg-[#D4AF37] hover:bg-[#B8952E] text-[#0B2545] transition-all transform hover:scale-[1.02] shadow-[0_0_12px_rgba(212,175,55,0.25)] focus:outline-none focus:ring-2 focus:ring-[#D4AF37]"
                 >
                   <Calendar className="w-3.5 h-3.5 text-[#0B2545]" />
-                  <span>Subscribe to Calendar Feeds</span>
+                  <span>Subscribe to Feeds</span>
+                </button>
+                <button
+                  onClick={() => setIsSignageModalOpen(true)}
+                  className="inline-flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold bg-white/10 hover:bg-white/20 text-white border border-white/20 transition-all focus:outline-none focus:ring-2 focus:ring-[#D4AF37]"
+                >
+                  <span>Signage &amp; Kiosk</span>
                 </button>
               </div>
             </div>
@@ -374,6 +610,12 @@ export function CalendarHub({ initialData }: CalendarHubProps) {
         }
         isOpen={isSubscribeOpen}
         onClose={() => setIsSubscribeOpen(false)}
+      />
+
+      {/* Digital Signage / Xibo CMS Modal */}
+      <SignageModal
+        isOpen={isSignageModalOpen}
+        onClose={() => setIsSignageModalOpen(false)}
       />
     </div>
   );
