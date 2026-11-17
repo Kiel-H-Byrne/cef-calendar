@@ -17,6 +17,7 @@ import { EventModal } from "./EventModal";
 import { FilterToolbar } from "./FilterToolbar";
 import { FiveColorOesStrip } from "./FraternalEmblems";
 import { Header } from "./Header";
+import { PrintHeader } from "./PrintHeader";
 import { SignageHeader } from "./SignageHeader";
 import { SignageModal } from "./SignageModal";
 import { SubscribeModal } from "./SubscribeModal";
@@ -158,6 +159,25 @@ export function CalendarHub({ initialData }: CalendarHubProps) {
   const [isSubscribeOpen, setIsSubscribeOpen] = useState(false);
   const [isSignageModalOpen, setIsSignageModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isPrinting, setIsPrinting] = useState(false);
+
+  // Detect print state to dynamically expand all events for full one-page printing
+  useEffect(() => {
+    const handleBeforePrint = () => setIsPrinting(true);
+    const handleAfterPrint = () => setIsPrinting(false);
+
+    window.addEventListener("beforeprint", handleBeforePrint);
+    window.addEventListener("afterprint", handleAfterPrint);
+
+    return () => {
+      window.removeEventListener("beforeprint", handleBeforePrint);
+      window.removeEventListener("afterprint", handleAfterPrint);
+    };
+  }, []);
+
+  const handlePrint = () => {
+    window.print();
+  };
 
   // Signage header synchronization state
   const [calendarTitle, setCalendarTitle] = useState("");
@@ -336,7 +356,17 @@ export function CalendarHub({ initialData }: CalendarHubProps) {
           isLoading={isLoading}
           onOpenSubscribeModal={() => setIsSubscribeOpen(true)}
           onOpenSignageModal={() => setIsSignageModalOpen(true)}
+          onPrint={handlePrint}
           feedStatus={feedStatus}
+        />
+
+        {/* Dedicated Clean Header for PDF / Printer Exports */}
+        <PrintHeader
+          title={calendarTitle}
+          sources={sources}
+          selectedOrgIds={selectedOrgIds}
+          searchQuery={searchQuery}
+          totalEvents={events.length}
         />
 
         {/* Interactive FullCalendar View */}
@@ -347,6 +377,7 @@ export function CalendarHub({ initialData }: CalendarHubProps) {
           searchQuery={searchQuery}
           onEventClick={(ev) => setSelectedEvent(ev)}
           isSignage={false}
+          isPrinting={isPrinting}
           initialViewType={targetView}
           initialDate={dateParam}
           calendarRefProp={calendarRef}

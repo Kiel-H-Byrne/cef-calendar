@@ -352,3 +352,153 @@ h1, h2, h3, h4, h5, h6 {
   margin-bottom: 0.25rem !important;
 }
 
+/* ==========================================================================
+   Full One-Page Print & PDF Export Styles (Web Views)
+   ========================================================================== */
+@media print {
+  /* Default page layout: landscape with neat 8mm margins for single-page fitting */
+  @page {
+    size: landscape;
+    margin: 6mm 8mm;
+  }
+
+  /* Force exact color reproduction on all printers and PDF engines */
+  *, ::before, ::after {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    color-adjust: exact !important;
+  }
+
+  /* Reset document background and fonts */
+  html, body {
+    background: #ffffff !important;
+    color: #1a1d20 !important;
+    font-size: 10px !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    width: 100% !important;
+  }
+
+  /* Hide interactive web chrome: header, footer, search, buttons, subscribe menu */
+  header:not(.print-header),
+  footer,
+  section[aria-label="Calendar Controls and Filters"],
+  .no-print,
+  .fc-header-toolbar,
+  .fc-more-link {
+    display: none !important;
+  }
+
+  /* Main container fills printable area without margin offsets */
+  main {
+    max-width: 100% !important;
+    width: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    box-shadow: none !important;
+  }
+
+  /* Calendar card wrapper: remove borders and shadows */
+  main > div {
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    background: transparent !important;
+  }
+
+  /* Avoid breaking Day, Week, and Month views across multiple pages */
+  .fc-daygrid,
+  .fc-timegrid,
+  .fc-scrollgrid {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+    border-color: #cbd5e1 !important;
+  }
+
+  /* High-contrast column headers in print */
+  .fc-col-header-cell {
+    background-color: #f1f5f9 !important;
+    border-color: #cbd5e1 !important;
+    padding: 2px 0 !important;
+  }
+
+  .fc-col-header-cell-cushion {
+    color: #0b2545 !important;
+    font-weight: 700 !important;
+    font-size: 8.5px !important;
+    text-transform: uppercase !important;
+  }
+
+  /* Month View: Compact day cells and event badges formatted to fit 1 page */
+  .fc-daygrid-day-frame {
+    min-height: 0 !important;
+  }
+
+  .fc-daygrid-day-number {
+    font-size: 8px !important;
+    font-weight: 700 !important;
+    padding: 1px 3px !important;
+    color: #334155 !important;
+  }
+
+  .fc-day-today .fc-daygrid-day-number {
+    background-color: #003366 !important;
+    color: #ffffff !important;
+    border-radius: 9999px !important;
+  }
+
+  .fc-daygrid-event {
+    margin: 1px 0 !important;
+    padding: 1px 2px !important;
+    font-size: 8px !important;
+    line-height: 1.15 !important;
+    border-radius: 3px !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  /* Day View & Week View: Scaled slot heights to fit the full day on 1 page */
+  .fc-timegrid-slot {
+    height: 1.55rem !important;
+  }
+
+  .fc-timegrid-slot-label-cushion {
+    font-size: 8px !important;
+    font-weight: 600 !important;
+    color: #475569 !important;
+  }
+
+  .fc-timegrid-event {
+    font-size: 8px !important;
+    padding: 1px 2px !important;
+    border-radius: 3px !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  /* Schedule / List View: Multi-page permitted with smooth natural pagination */
+  .fc-list {
+    page-break-inside: auto !important;
+    break-inside: auto !important;
+    border-color: #cbd5e1 !important;
+  }
+
+  .fc-list-event {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+    font-size: 9.5px !important;
+  }
+
+  .fc-list-day-cushion {
+    page-break-after: avoid !important;
+    break-after: avoid !important;
+    background-color: #f8fafc !important;
+    color: #0b2545 !important;
+    font-weight: 700 !important;
+    font-size: 10px !important;
+    border-left: 3px solid #d4af37 !important;
+  }
+}
+
+

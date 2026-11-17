@@ -17,6 +17,7 @@ interface CalendarViewProps {
   searchQuery: string;
   onEventClick: (event: UnifiedCalendarEvent) => void;
   isSignage?: boolean;
+  isPrinting?: boolean;
   initialViewType?: string;
   initialDate?: string;
   onViewTypeChange?: (viewType: string) => void;
@@ -44,6 +45,7 @@ export function CalendarView({
   searchQuery,
   onEventClick,
   isSignage = false,
+  isPrinting = false,
   initialViewType,
   initialDate,
   onViewTypeChange,
@@ -236,9 +238,9 @@ export function CalendarView({
         navLinks={!isSignage}
         editable={false}
         selectable={false}
-        // Critical requirement: all events shown, none truncated with (+N more) in signage mode
-        dayMaxEvents={isSignage ? false : 3}
-        moreLinkClick={isSignage ? undefined : 'popover'}
+        // Critical requirement: all events shown, none truncated with (+N more) in signage & print modes
+        dayMaxEvents={isSignage || isPrinting ? false : 3}
+        moreLinkClick={isSignage || isPrinting ? undefined : 'popover'}
         nowIndicator={true}
         expandRows={isSignage}
         height={isSignage ? '100%' : currentViewType === 'timeGridDay' ? '80vh' : 'auto'}
@@ -250,7 +252,7 @@ export function CalendarView({
         aspectRatio={isSignage ? undefined : isMobile ? 0.9 : 1.75}
         views={{
           dayGridMonth: {
-            dayMaxEvents: isSignage ? false : 3,
+            dayMaxEvents: isSignage || isPrinting ? false : 3,
           },
           timeGridWeek: {
             ...TIME_GRID_HOURS,
